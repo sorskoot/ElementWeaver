@@ -1,6 +1,11 @@
 import React, {createContext, useContext} from 'react';
+import {IGameFlowService} from '../services/GameFlowService.ts';
+import {IGamePlayService} from '../services/GamePlayService.ts';
 
-export interface GameServices {}
+export interface GameServices {
+    gameFlowService: IGameFlowService;
+    gamePlayService: IGamePlayService;
+}
 
 const GameServicesContext = createContext<GameServices | null>(null);
 
@@ -23,23 +28,11 @@ export function useGameServices(): GameServices {
     return services;
 }
 
-// // Convenience exports for the services
-// export function useGameFlowService() {
-//     return useGameServices().gameFlowService;
-// }
+// Convenience exports for the services
+export function useGameFlowService() {
+    return useGameServices().gameFlowService;
+}
 
-// export function useUiStateService() {
-//     return useGameServices().uiStateService;
-// }
-
-// export function useGamePlayService() {
-//     return useGameServices().gamePlayService;
-// }
-
-// export function usePlayCardService() {
-//     return useGameServices().playCardService;
-// }
-
-// export function useTileInteractionService() {
-//     return useGameServices().tileInteractionService;
-// }
+export function useGamePlayService() {
+    return useGameServices().gamePlayService;
+}

@@ -1569,6 +1569,39 @@
                     }
                 }
             ]
+        },
+        "235": {
+            "name": "UI"
+        },
+        "236": {
+            "name": "Main Menu",
+            "parent": "235",
+            "components": [
+                {
+                    "type": "root-ui",
+                    "root-ui": {
+                        "textMaterial": "DefaultFontMaterial",
+                        "panelMaterialTextured": "215",
+                        "panelMaterial": "214"
+                    }
+                }
+            ],
+            "translation": [
+                -0.5,
+                2.0589609,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.1,
+                0.1,
+                0.1
+            ]
         }
     },
     "meshes": {
@@ -2106,6 +2139,14 @@
                 "name": "Gray",
                 "file": "assets\\models\\tile.fbx"
             }
+        },
+        "214": {
+            "name": "UI Panel",
+            "pipeline": "34"
+        },
+        "215": {
+            "name": "UI Panel Texture",
+            "pipeline": "35"
         }
     },
     "shaders": {
@@ -2228,7 +2269,9 @@
                 "entryPoint": "js/index.ts",
                 "sourcePaths": [
                     "js/",
-                    "js/components"
+                    "js/components",
+                    "js/ui",
+                    "js/ui/components/main-menu"
                 ]
             },
             "application": {
