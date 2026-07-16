@@ -1,3 +1,4 @@
+import {TileType} from '../types/HexTile.ts';
 import {Tags} from './Tags.ts';
 
 const TILE_SIZE = 1 / Math.sqrt(3);
@@ -7,7 +8,6 @@ const TILE_SIZE = 1 / Math.sqrt(3);
  */
 export class HexagonTile {
     private _id: string;
-
     public get id(): string {
         return this._id;
     }
@@ -21,7 +21,8 @@ export class HexagonTile {
     constructor(
         public x: number,
         public y: number,
-        public z: number
+        public z: number,
+        public readonly type: TileType = TileType.placeholder
     ) {
         this._id = `${x},${y},${z}`;
     }

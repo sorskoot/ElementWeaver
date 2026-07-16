@@ -35,13 +35,12 @@ export class HexagonGrid implements Cloneable<HexagonGrid> {
 
     /**
      * Adds a new hexagon tile to the grid.
+     * Replaces any existing tile at the same coordinates.
      * @param tile - The hexagon tile to add.
      */
     public addTile(tile: HexagonTile): void {
         const key: string = this.getKey(tile.x, tile.y, tile.z);
-        if (!this._tiles.has(key)) {
-            this._tiles.set(key, tile);
-        }
+        this._tiles.set(key, tile);
     }
 
     /**
@@ -65,5 +64,12 @@ export class HexagonGrid implements Cloneable<HexagonGrid> {
      */
     public getAllTiles(): HexagonTile[] {
         return Array.from(this._tiles.values());
+    }
+
+    /**
+     * Clears all tiles from the grid.
+     */
+    public clear(): void {
+        this._tiles.clear();
     }
 }

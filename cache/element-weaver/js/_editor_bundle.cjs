@@ -32003,6 +32003,91 @@
   };
   var serviceLocator = new ServiceLocator2();
 
+  // js/models/GameModel.ts
+  var GameModel_exports = {};
+  __export(GameModel_exports, {
+    GameModel: () => GameModel
+  });
+
+  // js/classes/HexGrid.ts
+  var HexGrid_exports = {};
+  __export(HexGrid_exports, {
+    HexagonGrid: () => HexagonGrid
+  });
+  var HexagonGrid = class {
+    /**
+     * A map storing hexagon tiles with their unique keys.
+     */
+    _tiles;
+    /**
+     * Creates a new HexagonGrid instance and initializes it with a center tile.
+     */
+    constructor() {
+      this._tiles = /* @__PURE__ */ new Map();
+    }
+    clone() {
+      console.warn("NOT REALLY CLONING THE GRID");
+      return this;
+    }
+    /**
+     * Generates a unique key for a hexagon tile based on its coordinates.
+     * @param x - The x-coordinate of the tile.
+     * @param y - The y-coordinate of the tile.
+     * @param z - The z-coordinate of the tile.
+     * @returns A unique string key for the tile.
+     */
+    getKey(x2, y2, z) {
+      return `${x2},${y2},${z}`;
+    }
+    /**
+     * Adds a new hexagon tile to the grid.
+     * @param tile - The hexagon tile to add.
+     */
+    addTile(tile) {
+      const key = this.getKey(tile.x, tile.y, tile.z);
+      if (!this._tiles.has(key)) {
+        this._tiles.set(key, tile);
+      }
+    }
+    /**
+     * Retrieves a tile at specific cube coordinates.
+     * @param x - The x-coordinate of the tile.
+     * @param y - The y-coordinate of the tile.
+     * @param z - The z-coordinate of the tile.
+     * @returns The hexagon tile at the specified coordinates, or undefined if not found.
+     */
+    getTile(x2, y2, z) {
+      return this.getTileById(this.getKey(x2, y2, z));
+    }
+    getTileById(id) {
+      return this._tiles.get(id);
+    }
+    /**
+     * Retrieves all tiles in the grid.
+     * @returns An array of all hexagon tiles in the grid.
+     */
+    getAllTiles() {
+      return Array.from(this._tiles.values());
+    }
+    /**
+     * Clears all tiles from the grid.
+     */
+    clear() {
+      this._tiles.clear();
+    }
+  };
+
+  // js/models/GameModel.ts
+  var GameModel = class {
+    grid;
+    constructor() {
+      this.grid = new HexagonGrid();
+    }
+    clearGrid() {
+      this.grid.clear();
+    }
+  };
+
   // js/models/ConfigModel.ts
   var ConfigModel = class {
   };
@@ -32015,8 +32100,16 @@
   };
 
   // js/services/GamePlayService.ts
+  var GamePlayService_exports = {};
+  __export(GamePlayService_exports, {
+    GamePlayService: () => GamePlayService
+  });
   var GamePlayService = class {
-    constructor() {
+    constructor(gameModel2) {
+      this.gameModel = gameModel2;
+    }
+    newGame() {
+      this.gameModel.clearGrid();
     }
   };
 
@@ -32450,14 +32543,17 @@
     configService: Symbol("ConfigService"),
     gamePlayService: Symbol("GamePlayService"),
     gameFlowService: Symbol("GameFlowService"),
-    configModel: Symbol("ConfigModel")
+    configModel: Symbol("ConfigModel"),
+    gameModel: Symbol("GameModel")
   };
+  var gameModel = new GameModel();
   var configModel = new ConfigModel();
   var configService = new ConfigService(configModel);
-  var gamePlayService = new GamePlayService();
+  var gamePlayService = new GamePlayService(gameModel);
   var gameFlowService = new GameFlowService();
   function registerServices() {
     serviceLocator.registerSingleton(Services.configModel, configModel);
+    serviceLocator.registerSingleton(Services.gameModel, gameModel);
     serviceLocator.registerSingleton(Services.configService, configService);
     serviceLocator.registerSingleton(Services.gamePlayService, gamePlayService);
     serviceLocator.registerSingleton(Services.gameFlowService, gameFlowService);
@@ -36106,8 +36202,11 @@
   _registerEditor(dist_exports3);
   _registerEditor(dist_exports2);
   _registerEditor(bootstrap_services_exports);
+  _registerEditor(HexGrid_exports);
   _registerEditor(hex_grid_exports);
   _registerEditor(tile_prefabs_exports);
+  _registerEditor(GameModel_exports);
+  _registerEditor(GamePlayService_exports);
   _registerEditor(GameServicesProvider_exports);
   _registerEditor(mainMenu_exports);
   _registerEditor(useMenuViewModel_exports);
