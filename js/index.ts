@@ -9,6 +9,8 @@
  */
 
 import {WonderlandEngine} from '@wonderlandengine/api';
+import {registerServices} from './bootstrap-services.ts';
+
 /* wle:auto-imports:start */
 import {AudioListener} from '@wonderlandengine/components';
 import {Cursor} from '@wonderlandengine/components';
@@ -23,6 +25,7 @@ import {TilePrefabs} from './components/tile-prefabs.js';
 /* wle:auto-imports:end */
 
 export default function (engine: WonderlandEngine) {
+    registerServices();
     /* wle:auto-register:start */
 engine.registerComponent(AudioListener);
 engine.registerComponent(Cursor);
