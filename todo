@@ -1,0 +1,58 @@
+Element Weaver:
+	Vertical Slice:
+		☐ Create TileModel @est(30m)
+		☐ Create BoardModel with occupied and placeholder cells @est(1h)
+		☐ Create TileGenerator with weighted element pool @est(1h)
+		☐ Spawn initial tile without Spirit @est(30m)
+		☐ Create PlacementService @est(1h)
+		☐ Generate placeholder cells around occupied tiles @est(1h)
+		☐ Implement neighbor lookup @est(30m)
+		☐ Implement tile rotation @est(30m)
+		☐ Place tile on selected placeholder @est(1h)
+		☐ Update board after placement @est(1h)
+		☐ Implement direct match detection @est(1h)
+		☐ Implement basic scoring @est(30m)
+		☐ Show current score @est(30m)
+		☐ Generate and display next tile preview @est(1h)
+
+	Gameplay Systems:
+		☐ Create GameState model @est(30m)
+		☐ Implement combo system @est(1h)
+		☐ Implement multiplier system @est(1h)
+		☐ Make multiplier cap configurable @est(15m)
+		☐ Implement Spirit rules @est(1h)
+		☐ Limit generated tiles to one Spirit side @est(30m)
+
+	VR And Interaction:
+		☐ Create placeholder visual prefab @est(30m)
+		☐ Add placeholder hover feedback @est(30m)
+		☐ Snap held tile to hovered placeholder @est(1h)
+		☐ Show placement preview above board @est(30m)
+		☐ Support mouse placement @est(30m)
+		☐ Support VR controller placement @est(30m)
+
+	User Interface:
+		☐ Display score @est(30m)
+		☐ Display combo count @est(30m)
+		☐ Display multiplier @est(30m)
+		☐ Display next tile preview @est(30m)
+
+	Polish:
+		☐ Floating score popups @est(1h)
+		☐ Placement animation @est(1h)
+		☐ Combo feedback effects @est(1h)
+		☐ Placement sound effects @est(30m)
+
+	Stretch Goals:
+		☐ Limited tile game mode @est(2h)
+		☐ Configurable tile count @est(30m)
+		☐ Timed game mode @est(2h)
+		☐ High score tracking @est(1h)
+
+	Architecture:
+		☐ Create service layer structure @est(30m)
+		☐ Create model layer structure @est(30m)
+		☐ Create ViewModel layer structure @est(30m)
+		☐ Keep Wonderland components presentation-only @est(15m)
+
+

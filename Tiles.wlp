@@ -1,0 +1,602 @@
+{
+    "settings": {
+        "project": {
+            "kind": "prefab",
+            "name": "Tiles",
+            "version": [
+                1,
+                6,
+                1
+            ],
+            "prefab": true
+        }
+    },
+    "files": {
+        "1": {
+            "fileName": "assets/models/tile.fbx",
+            "importerName": ""
+        },
+        "2": {
+            "fileName": "assets/models/tile_empty.fbx",
+            "importerName": ""
+        }
+    },
+    "meshes": {
+        "1": {
+            "link": {
+                "name": "mesh_0",
+                "file": "assets\\models\\tile.fbx"
+            }
+        },
+        "2": {
+            "link": {
+                "name": "mesh_1",
+                "file": "assets\\models\\tile.fbx"
+            }
+        },
+        "3": {
+            "link": {
+                "name": "mesh_2",
+                "file": "assets\\models\\tile.fbx"
+            }
+        },
+        "4": {
+            "link": {
+                "name": "mesh_3",
+                "file": "assets\\models\\tile.fbx"
+            }
+        },
+        "5": {
+            "link": {
+                "name": "mesh_4",
+                "file": "assets\\models\\tile.fbx"
+            }
+        },
+        "6": {
+            "link": {
+                "name": "mesh_5",
+                "file": "assets\\models\\tile.fbx"
+            }
+        },
+        "7": {
+            "link": {
+                "name": "mesh_6",
+                "file": "assets\\models\\tile.fbx"
+            }
+        },
+        "8": {
+            "link": {
+                "name": "mesh_0",
+                "file": "assets\\models\\tile_empty.fbx"
+            }
+        }
+    },
+    "images": {},
+    "textures": {},
+    "fonts": {},
+    "audioClips": {},
+    "shaderChunks": {
+        "1": {
+            "link": {
+                "name": "lib\\Color.glsl",
+                "file": "default"
+            }
+        },
+        "2": {
+            "link": {
+                "name": "lib\\Compatibility.glsl",
+                "file": "default"
+            }
+        },
+        "3": {
+            "link": {
+                "name": "lib\\CoordinateSystems.glsl",
+                "file": "default"
+            }
+        },
+        "4": {
+            "link": {
+                "name": "lib\\GI.glsl",
+                "file": "default"
+            }
+        },
+        "5": {
+            "link": {
+                "name": "lib\\Inputs.glsl",
+                "file": "default"
+            }
+        },
+        "6": {
+            "link": {
+                "name": "lib\\Lights.glsl",
+                "file": "default"
+            }
+        },
+        "7": {
+            "link": {
+                "name": "lib\\Materials.glsl",
+                "file": "default"
+            }
+        },
+        "8": {
+            "link": {
+                "name": "lib\\Math.glsl",
+                "file": "default"
+            }
+        },
+        "9": {
+            "link": {
+                "name": "lib\\MorphTargets.glsl",
+                "file": "default"
+            }
+        },
+        "10": {
+            "link": {
+                "name": "lib\\Packing.glsl",
+                "file": "default"
+            }
+        },
+        "11": {
+            "link": {
+                "name": "lib\\PhysicalBSDF.glsl",
+                "file": "default"
+            }
+        },
+        "12": {
+            "link": {
+                "name": "lib\\Quaternion.glsl",
+                "file": "default"
+            }
+        },
+        "13": {
+            "link": {
+                "name": "lib\\SkyProcedural.glsl",
+                "file": "default"
+            }
+        },
+        "14": {
+            "link": {
+                "name": "lib\\Slug.frag.glsl",
+                "file": "default"
+            }
+        },
+        "15": {
+            "link": {
+                "name": "lib\\Slug.vert.glsl",
+                "file": "default"
+            }
+        },
+        "16": {
+            "link": {
+                "name": "lib\\Surface.glsl",
+                "file": "default"
+            }
+        },
+        "17": {
+            "link": {
+                "name": "lib\\Textures.glsl",
+                "file": "default"
+            }
+        },
+        "18": {
+            "link": {
+                "name": "lib\\Uniforms.glsl",
+                "file": "default"
+            }
+        },
+        "19": {
+            "link": {
+                "name": "lib\\VertexAttributes.glsl",
+                "file": "default"
+            }
+        }
+    },
+    "shaders": {
+        "1": {
+            "link": {
+                "name": "AtmosphericSky.frag",
+                "file": "default"
+            }
+        },
+        "2": {
+            "link": {
+                "name": "Background.frag",
+                "file": "default"
+            }
+        },
+        "3": {
+            "link": {
+                "name": "Color.frag",
+                "file": "default"
+            }
+        },
+        "4": {
+            "link": {
+                "name": "Depth.frag",
+                "file": "default"
+            }
+        },
+        "5": {
+            "link": {
+                "name": "DistanceFieldVector.frag",
+                "file": "default"
+            }
+        },
+        "6": {
+            "link": {
+                "name": "Dynamic.vert",
+                "file": "default"
+            }
+        },
+        "7": {
+            "link": {
+                "name": "Flat.frag",
+                "file": "default"
+            }
+        },
+        "8": {
+            "link": {
+                "name": "FullScreenTriangle.vert",
+                "file": "default"
+            }
+        },
+        "9": {
+            "link": {
+                "name": "MeshVisualizer.frag",
+                "file": "default"
+            }
+        },
+        "10": {
+            "link": {
+                "name": "Phong.frag",
+                "file": "default"
+            }
+        },
+        "11": {
+            "link": {
+                "name": "Physical.frag",
+                "file": "default"
+            }
+        },
+        "12": {
+            "link": {
+                "name": "Skinning.vert",
+                "file": "default"
+            }
+        },
+        "13": {
+            "link": {
+                "name": "Sky.frag",
+                "file": "default"
+            }
+        },
+        "14": {
+            "link": {
+                "name": "Text.frag",
+                "file": "default"
+            }
+        },
+        "15": {
+            "link": {
+                "name": "Text.vert",
+                "file": "default"
+            }
+        },
+        "16": {
+            "link": {
+                "name": "TileFeedback.frag",
+                "file": "default"
+            }
+        },
+        "17": {
+            "link": {
+                "name": "Particle.frag",
+                "file": "default"
+            }
+        }
+    },
+    "pipelines": {
+        "1": {
+            "link": {
+                "name": "Color",
+                "file": "default"
+            }
+        },
+        "2": {
+            "link": {
+                "name": "VertexColor",
+                "file": "default"
+            }
+        },
+        "3": {
+            "link": {
+                "name": "Depth",
+                "file": "default"
+            }
+        },
+        "4": {
+            "link": {
+                "name": "DistanceFieldVector",
+                "file": "default"
+            }
+        },
+        "5": {
+            "link": {
+                "name": "Flat Opaque",
+                "file": "default"
+            }
+        },
+        "6": {
+            "link": {
+                "name": "Flat Opaque Textured",
+                "file": "default"
+            }
+        },
+        "7": {
+            "link": {
+                "name": "MeshVisualizer",
+                "file": "default"
+            }
+        },
+        "8": {
+            "link": {
+                "name": "Phong Opaque",
+                "file": "default"
+            }
+        },
+        "9": {
+            "link": {
+                "name": "Phong Opaque Textured",
+                "file": "default"
+            }
+        },
+        "10": {
+            "link": {
+                "name": "Phong Normalmapped",
+                "file": "default"
+            }
+        },
+        "11": {
+            "link": {
+                "name": "Phong Lightmapped",
+                "file": "default"
+            }
+        },
+        "12": {
+            "link": {
+                "name": "Physical Opaque",
+                "file": "default"
+            }
+        },
+        "13": {
+            "link": {
+                "name": "Physical Opaque Textured",
+                "file": "default"
+            }
+        },
+        "14": {
+            "link": {
+                "name": "Text",
+                "file": "default"
+            }
+        },
+        "15": {
+            "link": {
+                "name": "TileFeedback",
+                "file": "default"
+            }
+        },
+        "16": {
+            "link": {
+                "name": "Foliage",
+                "file": "default"
+            }
+        },
+        "17": {
+            "link": {
+                "name": "Particle",
+                "file": "default"
+            }
+        },
+        "18": {
+            "link": {
+                "name": "Sky",
+                "file": "default"
+            }
+        },
+        "19": {
+            "link": {
+                "name": "AtmosphericSky",
+                "file": "default"
+            }
+        }
+    },
+    "materials": {
+        "1": {
+            "link": {
+                "name": "Base",
+                "file": "assets\\models\\tile.fbx"
+            },
+            "Phong": {
+                "ambientColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "specularColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "shininess": 1
+            },
+            "pipeline": "12",
+            "Physical": {
+                "metallicFactor": 0.5,
+                "roughnessFactor": 0.6999999
+            }
+        },
+        "2": {
+            "link": {
+                "name": "Fire",
+                "file": "assets\\models\\tile.fbx"
+            },
+            "pipeline": "12",
+            "Physical": {
+                "metallicFactor": 0.2,
+                "roughnessFactor": 0.6999999
+            }
+        },
+        "3": {
+            "link": {
+                "name": "Water",
+                "file": "assets\\models\\tile.fbx"
+            },
+            "pipeline": "12",
+            "Physical": {
+                "metallicFactor": 0.2,
+                "roughnessFactor": 0.6999999
+            }
+        },
+        "4": {
+            "link": {
+                "name": "Earth",
+                "file": "assets\\models\\tile.fbx"
+            },
+            "pipeline": "12",
+            "Physical": {
+                "metallicFactor": 0.2,
+                "roughnessFactor": 0.6999999
+            }
+        },
+        "5": {
+            "link": {
+                "name": "Air",
+                "file": "assets\\models\\tile.fbx"
+            },
+            "pipeline": "12",
+            "Physical": {
+                "metallicFactor": 0.2,
+                "roughnessFactor": 0.6999999
+            }
+        },
+        "6": {
+            "link": {
+                "name": "Spirit",
+                "file": "assets\\models\\tile.fbx"
+            },
+            "Phong": {
+                "diffuseColor": [
+                    0.6352939,
+                    0.0,
+                    1.0,
+                    1.0
+                ],
+                "ambientColor": [
+                    0.2,
+                    0.2,
+                    0.2,
+                    1.0
+                ],
+                "shininess": 25,
+                "specularColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "pipeline": "12",
+            "Physical": {
+                "metallicFactor": 0.2,
+                "roughnessFactor": 0.6999999
+            }
+        },
+        "7": {
+            "link": {
+                "name": "Gray",
+                "file": "assets\\models\\tile.fbx"
+            },
+            "pipeline": "12",
+            "Physical": {
+                "metallicFactor": 0.2,
+                "roughnessFactor": 0.6999999
+            }
+        }
+    },
+    "objects": {
+        "1": {
+            "name": "Tile",
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "hiddenForLightBaking": true,
+            "translation": [
+                2.0,
+                0.0,
+                0.0
+            ]
+        },
+        "2": {
+            "name": "Placeholder",
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "3": {
+            "link": {
+                "name": "ND — Sketch.002",
+                "file": "assets\\models\\tile.fbx"
+            },
+            "parent": "1",
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        "4": {
+            "link": {
+                "name": "ND — Sketch.003",
+                "file": "assets\\models\\tile_empty.fbx"
+            },
+            "parent": "2",
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "components": [
+                {
+                    "originalIndex": 0,
+                    "mesh": {
+                        "material": "1"
+                    }
+                }
+            ]
+        }
+    },
+    "animations": {},
+    "skins": {},
+    "languages": {},
+    "morphTargets": {},
+    "particleEffects": {},
+    "probeVolumeScenarios": {},
+    "plugins": {}
+}

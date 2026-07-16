@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "target": "es2022",
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
+        "experimentalDecorators": true,
+        "jsx": "react-jsx",
+        "allowImportingTsExtensions": true,
+        "noEmit": true
+    },
+
+    "include": ["./js/**/*.ts", "./js/**/*.tsx"],
+    "exclude": ["node_modules", "deploy"]
+}

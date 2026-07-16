@@ -1,0 +1,10 @@
+import * as __sorskoot_wonderland_components from '@sorskoot/wonderland-components';
+_registerEditor(__sorskoot_wonderland_components);
+import * as __wonderlandengine_components from '@wonderlandengine/components';
+_registerEditor(__wonderlandengine_components);
+import * as __wonderlandengine_spatial_audio from '@wonderlandengine/spatial-audio';
+_registerEditor(__wonderlandengine_spatial_audio);
+import * as _E__Dev_ManiFestJVRam2_2026_2_js_components_hex_grid_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/components/hex-grid.ts';
+_registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_components_hex_grid_ts);
+import * as _E__Dev_ManiFestJVRam2_2026_2_js_components_tile_prefabs_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/components/tile-prefabs.ts';
+_registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_components_tile_prefabs_ts);
