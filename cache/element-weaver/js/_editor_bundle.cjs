@@ -32009,11 +32009,165 @@
     GameModel: () => GameModel
   });
 
-  // js/classes/HexGrid.ts
-  var HexGrid_exports = {};
-  __export(HexGrid_exports, {
-    HexagonGrid: () => HexagonGrid
+  // js/classes/HexagonTile.ts
+  var HexagonTile_exports = {};
+  __export(HexagonTile_exports, {
+    HexagonTile: () => HexagonTile
   });
+
+  // js/classes/Tags.ts
+  var _Tags2 = class {
+    _tagList = /* @__PURE__ */ new Map();
+    static get instance() {
+      if (!_Tags2._instance) {
+        _Tags2._instance = new _Tags2();
+      }
+      return _Tags2._instance;
+    }
+    constructor() {
+    }
+    static setTag(tag, hexagonTileID) {
+      const instance = _Tags2.instance;
+      if (!instance._tagList.has(tag)) {
+        instance._tagList.set(tag, /* @__PURE__ */ new Set());
+      }
+      instance._tagList.get(tag)?.add(hexagonTileID);
+    }
+    static getTags(hexagonTileID) {
+      const instance = _Tags2.instance;
+      const tags = [];
+      for (const [tag, tileIDs] of instance._tagList.entries()) {
+        if (tileIDs.has(hexagonTileID)) {
+          tags.push(tag);
+        }
+      }
+      return tags;
+    }
+    static hasTag(tag, hexagonTileID) {
+      const instance = _Tags2.instance;
+      return instance._tagList.get(tag)?.has(hexagonTileID) ?? false;
+    }
+    static removeTag(tag, hexagonTileID) {
+      const instance = _Tags2.instance;
+      if (instance._tagList.has(tag)) {
+        const tileIDs = instance._tagList.get(tag);
+        if (tileIDs?.delete(hexagonTileID)) {
+          if (tileIDs.size === 0) {
+            instance._tagList.delete(tag);
+          }
+          return true;
+        }
+      }
+      return false;
+    }
+    static getTilesWithTag(tag) {
+      const instance = _Tags2.instance;
+      return Array.from(instance._tagList.get(tag) || []);
+    }
+    static getTileWithTag(tag) {
+      return _Tags2.getTilesWithTag(tag)[0];
+    }
+  };
+  var Tags2 = _Tags2;
+  __publicField(Tags2, "_instance");
+
+  // js/classes/HexagonTile.ts
+  var TILE_SIZE = 2 / Math.sqrt(3);
+  var HexagonTile = class {
+    /**
+     * Creates a new HexagonTile instance.
+     * @param x - The x-coordinate in cube coordinates.
+     * @param y - The y-coordinate in cube coordinates.
+     * @param z - The z-coordinate in cube coordinates.
+     */
+    constructor(x2, y2, z, type = "placeholder" /* placeholder */) {
+      this.x = x2;
+      this.y = y2;
+      this.z = z;
+      this.type = type;
+      this._id = `${x2},${y2},${z}`;
+    }
+    _id;
+    get id() {
+      return this._id;
+    }
+    /**
+     * Calculates the neighboring tiles in cube coordinates.
+     * @returns An array of neighboring tiles' cube coordinates.
+     */
+    neighbors() {
+      const directions = [
+        [1, -1, 0],
+        [1, 0, -1],
+        [0, 1, -1],
+        [-1, 1, 0],
+        [-1, 0, 1],
+        [0, -1, 1]
+      ];
+      return directions.map((a2) => {
+        return {
+          x: this.x + a2[0],
+          y: this.y + a2[1],
+          z: this.z + a2[2]
+        };
+      });
+    }
+    /**
+     * Converts the cube coordinates of this tile to 2D coordinates.
+     * @returns The 2D position of the tile.
+     */
+    to2D() {
+      const x2D = TILE_SIZE * Math.sqrt(3) * (this.x + this.z / 2);
+      const y2D = TILE_SIZE * (3 / 2) * this.z;
+      return { x: x2D, y: y2D };
+    }
+    /**
+     * Converts 2D coordinates to cube coordinates and rounds to the nearest hex tile.
+     * @param x2D - The x-coordinate in 2D space.
+     * @param y2D - The y-coordinate in 2D space.
+     * @returns The cube coordinates of the nearest hex tile.
+     */
+    static from2D(x2D, y2D) {
+      const q = (x2D * Math.sqrt(3) / 3 - y2D / 3) / TILE_SIZE;
+      const r2 = y2D * 2 / 3 / TILE_SIZE;
+      const [x2, y2, z] = HexagonTile.roundCube(q, -q - r2, r2);
+      return { x: x2, y: y2, z };
+    }
+    /**
+     * Rounds cube coordinates to the nearest hex tile.
+     * @param x - The x-coordinate in cube space.
+     * @param y - The y-coordinate in cube space.
+     * @param z - The z-coordinate in cube space.
+     * @returns The rounded cube coordinates.
+     */
+    static roundCube(x2, y2, z) {
+      let rx = Math.round(x2);
+      let ry = Math.round(y2);
+      let rz = Math.round(z);
+      const xDiff = Math.abs(rx - x2);
+      const yDiff = Math.abs(ry - y2);
+      const zDiff = Math.abs(rz - z);
+      if (xDiff > yDiff && xDiff > zDiff) {
+        rx = -ry - rz;
+      } else if (yDiff > zDiff) {
+        ry = -rx - rz;
+      } else {
+        rz = -rx - ry;
+      }
+      return [rx, ry, rz];
+    }
+    addTag(tag) {
+      Tags2.setTag(tag, this._id);
+    }
+    hasTag(tag) {
+      return Tags2.hasTag(tag, this._id);
+    }
+    equals(other) {
+      return this.x === other.x && this.y === other.y && this.z === other.z;
+    }
+  };
+
+  // js/classes/HexGrid.ts
   var HexagonGrid = class {
     /**
      * A map storing hexagon tiles with their unique keys.
@@ -32041,13 +32195,12 @@
     }
     /**
      * Adds a new hexagon tile to the grid.
+     * Replaces any existing tile at the same coordinates.
      * @param tile - The hexagon tile to add.
      */
     addTile(tile) {
       const key = this.getKey(tile.x, tile.y, tile.z);
-      if (!this._tiles.has(key)) {
-        this._tiles.set(key, tile);
-      }
+      this._tiles.set(key, tile);
     }
     /**
      * Retrieves a tile at specific cube coordinates.
@@ -32086,6 +32239,20 @@
     clearGrid() {
       this.grid.clear();
     }
+    getAllTiles() {
+      return this.grid.getAllTiles();
+    }
+    getTileAt(x2, y2, z) {
+      return this.grid.getTile(x2, y2, z);
+    }
+    getTileById(tileId) {
+      return this.grid.getTileById(tileId);
+    }
+    addTile(x2, y2, z, type) {
+      const newTile = new HexagonTile(x2, y2, z, type);
+      this.grid.addTile(newTile);
+      return newTile.id;
+    }
   };
 
   // js/models/ConfigModel.ts
@@ -32104,14 +32271,134 @@
   __export(GamePlayService_exports, {
     GamePlayService: () => GamePlayService
   });
+
+  // js/utils/Events.ts
+  var EventEmitter = class {
+    listeners = [];
+    /**
+     * Register a listener.
+     *
+     * @param listener - Listener to add.
+     */
+    wrapperMap = /* @__PURE__ */ new Map();
+    add(listener) {
+      this.listeners.push(listener);
+      this.wrapperMap.set(listener, listener);
+    }
+    /**
+     * Register a listener that will only be called if the predicate returns true.
+     *
+     * @param predicate - Predicate function to filter.
+     * @param listener - Listener to add.
+     *
+     * @example
+     * ```ts
+     * const e = new EventEmitter<[number, string]>();
+     * e.addFiltered((id, name) => id > 0, (id, name) => console.log(id, name));
+     * e.emit(0, 'alice'); // not logged
+     * e.emit(1, 'bob'); // logged
+     * ```
+     */
+    addFiltered(predicate, listener) {
+      const wrapper = (...data) => {
+        if (predicate(...data))
+          listener(...data);
+      };
+      this.listeners.push(wrapper);
+      this.wrapperMap.set(listener, wrapper);
+      return () => {
+        this.remove(listener);
+      };
+    }
+    /**
+     * Remove a previously registered listener.
+     *
+     * @param listener - Listener to remove.
+     */
+    remove(listener) {
+      const wrapper = this.wrapperMap.get(listener) ?? listener;
+      this.listeners = this.listeners.filter((l2) => l2 !== wrapper);
+      this.wrapperMap.delete(listener);
+    }
+    /**
+     * Emit an event to all registered listeners.
+     *
+     * @param data - Spread arguments forwarded to each listener.
+     *
+     * @example
+     * ```ts
+     * const e = new EventEmitter<[number, string]>();
+     * e.add((id, name) => console.log(id, name));
+     *
+     * e.emit(1, 'alice'); // logs: 1 alice
+     * ```
+     */
+    emit(...data) {
+      this.listeners.forEach((listener) => listener(...data));
+    }
+    /**
+     * Remove all listeners.
+     */
+    clear() {
+      this.listeners.length = 0;
+    }
+  };
+
+  // js/services/GamePlayService.ts
   var GamePlayService = class {
     constructor(gameModel2) {
       this.gameModel = gameModel2;
     }
+    onNewGame = new EventEmitter();
+    onTilesChanged = new EventEmitter();
     newGame() {
+      console.log("Starting a new game...");
       this.gameModel.clearGrid();
+      this.onNewGame.emit();
+      const changedTileIds = [];
+      const addedTileId = this.gameModel.addTile(0, 0, 0, "piece" /* piece */);
+      changedTileIds.push(addedTileId);
+      const addedPlaceholderIds = this.surroundWithPlaceholders();
+      changedTileIds.push(...addedPlaceholderIds);
+      this.onTilesChanged.emit(changedTileIds);
+    }
+    /**
+     * Surrounds all piece tiles with placeholder tiles if empty spots exist.
+     * @returns An array of IDs of the added placeholder tiles.
+     */
+    surroundWithPlaceholders() {
+      const addedTileIds = [];
+      const allTiles = this.gameModel.getAllTiles();
+      for (const tile of allTiles) {
+        const neighbors = tile.neighbors();
+        if (tile.type === "piece" /* piece */) {
+          for (const neighbor of neighbors) {
+            const neighborTile = this.gameModel.getTileAt(neighbor.x, neighbor.y, neighbor.z);
+            if (!neighborTile) {
+              const addedTileId = this.gameModel.addTile(
+                neighbor.x,
+                neighbor.y,
+                neighbor.z,
+                "placeholder" /* placeholder */
+              );
+              addedTileIds.push(addedTileId);
+            }
+          }
+        }
+      }
+      return addedTileIds;
+    }
+    getTile(tileId) {
+      return this.gameModel.getTileById(tileId);
     }
   };
+
+  // js/services/GameFlowService.ts
+  var GameFlowService_exports = {};
+  __export(GameFlowService_exports, {
+    GameFlowService: () => GameFlowService,
+    GameState: () => GameState
+  });
 
   // node_modules/@preact/signals-core/dist/signals-core.module.js
   var i = Symbol.for("preact-signals");
@@ -32529,11 +32816,21 @@
   }
 
   // js/services/GameFlowService.ts
+  var GameState = /* @__PURE__ */ ((GameState2) => {
+    GameState2["TitleScreen"] = "title-screen";
+    GameState2["Menu"] = "menu";
+    GameState2["Playing"] = "playing";
+    GameState2["Paused"] = "paused";
+    GameState2["GameOver"] = "game-over";
+    return GameState2;
+  })(GameState || {});
   var GameFlowService = class {
-    gameState = y("menu" /* Menu */);
-    constructor() {
+    constructor(gamePlayService2) {
+      this.gamePlayService = gamePlayService2;
     }
+    gameState = y("menu" /* Menu */);
     startGame() {
+      this.gamePlayService.newGame();
       this.gameState.value = "playing" /* Playing */;
     }
   };
@@ -32550,7 +32847,7 @@
   var configModel = new ConfigModel();
   var configService = new ConfigService(configModel);
   var gamePlayService = new GamePlayService(gameModel);
-  var gameFlowService = new GameFlowService();
+  var gameFlowService = new GameFlowService(gamePlayService);
   function registerServices() {
     serviceLocator.registerSingleton(Services.configModel, configModel);
     serviceLocator.registerSingleton(Services.gameModel, gameModel);
@@ -32580,19 +32877,50 @@
 
   // js/components/hex-grid.ts
   var HexGrid = class extends Component3 {
+    get gamePlayService() {
+      return serviceLocator.get(Services.gamePlayService);
+    }
+    hexTiles = /* @__PURE__ */ new Map();
     init() {
       this.tilePrefabs = this.tilePrefabsObject.getComponent(TilePrefabs);
     }
     start() {
-      setTimeout(() => {
-        const t2 = this.tilePrefabs.spawn("Tile");
-        t2.resetPosition();
-        t2.parent = this.object;
-        wlUtils.setActive(t2, true);
-      }, 1e3);
     }
-    update(dt) {
+    onActivate() {
+      this.gamePlayService.onNewGame.add(this.onNewGame);
+      this.gamePlayService.onTilesChanged.add(this.onTilesChanged);
     }
+    onDeactivate() {
+      this.gamePlayService.onNewGame.remove(this.onNewGame);
+      this.gamePlayService.onTilesChanged.remove(this.onTilesChanged);
+    }
+    onNewGame = () => {
+      this.hexTiles.forEach((tile) => {
+        if (tile && !tile.isDestroyed) {
+          tile.destroy();
+        }
+      });
+      this.hexTiles.clear();
+    };
+    onTilesChanged = (changedTileIds) => {
+      for (const tileId of changedTileIds) {
+        const existingTile = this.hexTiles.get(tileId);
+        if (existingTile && !existingTile.isDestroyed) {
+          existingTile.destroy();
+          this.hexTiles.delete(tileId);
+        }
+        const tile = this.gamePlayService.getTile(tileId);
+        if (tile) {
+          const newTile = this.tilePrefabs.spawn("Tile");
+          newTile.resetPosition();
+          newTile.parent = this.object;
+          const pos = tile.to2D();
+          newTile.setPositionLocal([pos.x, 0, pos.y]);
+          wlUtils.setActive(newTile, true);
+          this.hexTiles.set(tileId, newTile);
+        }
+      }
+    };
   };
   __publicField(HexGrid, "TypeName", "hex-grid");
   __decorateClass([
@@ -36202,10 +36530,11 @@
   _registerEditor(dist_exports3);
   _registerEditor(dist_exports2);
   _registerEditor(bootstrap_services_exports);
-  _registerEditor(HexGrid_exports);
+  _registerEditor(HexagonTile_exports);
   _registerEditor(hex_grid_exports);
   _registerEditor(tile_prefabs_exports);
   _registerEditor(GameModel_exports);
+  _registerEditor(GameFlowService_exports);
   _registerEditor(GamePlayService_exports);
   _registerEditor(GameServicesProvider_exports);
   _registerEditor(mainMenu_exports);

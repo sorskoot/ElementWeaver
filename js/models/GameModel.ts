@@ -26,6 +26,13 @@ export interface IGameModel {
      * @returns The ID of the newly added tile
      */
     addTile(x: number, y: number, z: number, type: TileType): string;
+
+    /**
+     * Gets a tile by its unique ID, if it exists in the grid.
+     * @param tileId The unique ID of the tile to retrieve.
+     * @returns The HexagonTile with the specified ID, or undefined if no such tile exists.
+     */
+    getTileById(tileId: string): HexagonTile | undefined;
 }
 
 export class GameModel implements IGameModel {
@@ -45,6 +52,10 @@ export class GameModel implements IGameModel {
 
     getTileAt(x: number, y: number, z: number): HexagonTile | undefined {
         return this.grid.getTile(x, y, z);
+    }
+
+    getTileById(tileId: string): HexagonTile | undefined {
+        return this.grid.getTileById(tileId);
     }
 
     addTile(x: number, y: number, z: number, type: TileType): string {

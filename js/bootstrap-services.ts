@@ -17,7 +17,7 @@ const gameModel = new GameModel();
 const configModel = new ConfigModel();
 const configService = new ConfigService(configModel);
 const gamePlayService = new GamePlayService(gameModel);
-const gameFlowService = new GameFlowService();
+const gameFlowService = new GameFlowService(gamePlayService);
 
 export function registerServices(): void {
     serviceLocator.registerSingleton(Services.configModel, configModel);

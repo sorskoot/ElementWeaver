@@ -64,7 +64,6 @@ export class EventEmitter<T extends unknown[] = unknown[]> {
         };
     }
 
-
     /**
      * Remove a previously registered listener.
      *
@@ -80,6 +79,14 @@ export class EventEmitter<T extends unknown[] = unknown[]> {
      * Emit an event to all registered listeners.
      *
      * @param data - Spread arguments forwarded to each listener.
+     *
+     * @example
+     * ```ts
+     * const e = new EventEmitter<[number, string]>();
+     * e.add((id, name) => console.log(id, name));
+     *
+     * e.emit(1, 'alice'); // logs: 1 alice
+     * ```
      */
     emit(...data: T) {
         this.listeners.forEach((listener) => listener(...data));

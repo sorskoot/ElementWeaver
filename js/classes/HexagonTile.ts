@@ -1,7 +1,7 @@
 import {TileType} from '../types/HexTile.ts';
 import {Tags} from './Tags.ts';
 
-const TILE_SIZE = 1 / Math.sqrt(3);
+const TILE_SIZE = 1; //1 / Math.sqrt(3);
 
 /**
  * Represents a hexagonal tile in a 3D space using cube coordinates.

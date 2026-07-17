@@ -1,21 +1,50 @@
+import {HexagonTile} from '../classes/HexagonTile.ts';
 import {IGameModel} from '../models/GameModel.ts';
 import {TileType} from '../types/HexTile.ts';
+import {EventEmitter} from '../utils/Events.ts';
 
 export interface IGamePlayService {
+    /**
+     * Starts a new game by clearing the grid and initializing it with a randomized tile and surrounding placeholder tiles.
+     * Emits the onNewGame event and the onTilesChanged event with the IDs of the changed tiles.
+     */
     newGame(): void;
+
+    /**
+     * Event emitted when a new game is started.
+     */
+    onNewGame: EventEmitter<[]>;
+
+    /**
+     * Event emitted when tiles are added, removed or changed in the grid.
+     * The event provides an array of tile IDs that have changed.
+     */
+    onTilesChanged: EventEmitter<[string[]]>;
+
+    getTile(tileId: string): HexagonTile | undefined;
 }
 
 export class GamePlayService implements IGamePlayService {
     constructor(private gameModel: IGameModel) {}
 
-    newGame(): void {
-        this.gameModel.clearGrid();
+    onNewGame = new EventEmitter<[]>();
+    onTilesChanged = new EventEmitter<[string[]]>();
 
+    newGame(): void {
+        console.log('Starting a new game...');
+        this.gameModel.clearGrid();
+        this.onNewGame.emit();
+
+        const changedTileIds: string[] = [];
         // Add a randomized tile to the center of the grid
-        this.gameModel.addTile(0, 0, 0, TileType.piece);
+        const addedTileId = this.gameModel.addTile(0, 0, 0, TileType.piece);
+        changedTileIds.push(addedTileId);
 
         // surround the center tile with 6 placeholder tiles
-        this.surroundWithPlaceholders();
+        const addedPlaceholderIds = this.surroundWithPlaceholders();
+        changedTileIds.push(...addedPlaceholderIds);
+
+        this.onTilesChanged.emit(changedTileIds);
     }
 
     /**
@@ -48,5 +77,9 @@ export class GamePlayService implements IGamePlayService {
             }
         }
         return addedTileIds;
+    }
+
+    getTile(tileId: string): HexagonTile | undefined {
+        return this.gameModel.getTileById(tileId);
     }
 }
