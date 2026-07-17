@@ -9,6 +9,9 @@
                 1
             ],
             "prefab": true
+        },
+        "runtime": {
+            "visualizePhysX": true
         }
     },
     "files": {
@@ -409,6 +412,15 @@
                 "name": "AtmosphericSky",
                 "file": "default"
             }
+        },
+        "20": {
+            "link": {
+                "name": "Physical Opaque",
+                "file": "default"
+            },
+            "name": "Physical Alpha",
+            "blending": true,
+            "castShadows": false
         }
     },
     "materials": {
@@ -524,6 +536,28 @@
                 "metallicFactor": 0.2,
                 "roughnessFactor": 0.6999999
             }
+        },
+        "8": {
+            "name": "Placeholder",
+            "pipeline": "20",
+            "Flat": {
+                "color": [
+                    0.0,
+                    1.0,
+                    1.0,
+                    0.2
+                ]
+            },
+            "Physical": {
+                "albedoColor": [
+                    0.0,
+                    1.0,
+                    1.0,
+                    0.2
+                ],
+                "metallicFactor": 0.1,
+                "roughnessFactor": 0.8999999
+            }
         }
     },
     "objects": {
@@ -547,6 +581,38 @@
                 1.0,
                 1.0,
                 1.0
+            ],
+            "components": [
+                {
+                    "type": "physx",
+                    "physx": {
+                        "shape": "convexMesh",
+                        "convexMesh": {
+                            "mesh": "8",
+                            "scaling": [
+                                0.15,
+                                0.15,
+                                0.15
+                            ]
+                        },
+                        "rotationOffset": [
+                            0.0,
+                            0.258819,
+                            0.0,
+                            0.9659258
+                        ],
+                        "trigger": true,
+                        "allowSimulation": false,
+                        "kinematic": true,
+                        "gravity": false
+                    }
+                },
+                {
+                    "type": "cursor-target"
+                },
+                {
+                    "type": "tile-interaction"
+                }
             ]
         },
         "3": {
@@ -579,9 +645,9 @@
             },
             "parent": "2",
             "scaling": [
-                1.0,
-                1.0,
-                1.0
+                0.8999999,
+                0.8999999,
+                0.8999999
             ],
             "translation": [
                 0.0,
@@ -592,7 +658,7 @@
                 {
                     "originalIndex": 0,
                     "mesh": {
-                        "material": "1"
+                        "material": "8"
                     }
                 }
             ],

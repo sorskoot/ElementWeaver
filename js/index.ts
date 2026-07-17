@@ -14,6 +14,7 @@ import {registerServices} from './bootstrap-services.ts';
 /* wle:auto-imports:start */
 import {AudioListener} from '@wonderlandengine/components';
 import {Cursor} from '@wonderlandengine/components';
+import {CursorTarget} from '@wonderlandengine/components';
 import {FingerCursor} from '@wonderlandengine/components';
 import {HandTracking} from '@wonderlandengine/components';
 import {MouseLookComponent} from '@wonderlandengine/components';
@@ -21,6 +22,7 @@ import {PlayerHeight} from '@wonderlandengine/components';
 import {VrModeActiveSwitch} from '@wonderlandengine/components';
 import {WasdControlsComponent} from '@wonderlandengine/components';
 import {HexGrid} from './components/hex-grid.js';
+import {TileInteraction} from './components/tile-interaction.js';
 import {TilePrefabs} from './components/tile-prefabs.js';
 import {RootUI} from './ui/root-ui.tsx';
 /* wle:auto-imports:end */
@@ -30,6 +32,7 @@ export default function (engine: WonderlandEngine) {
     /* wle:auto-register:start */
 engine.registerComponent(AudioListener);
 engine.registerComponent(Cursor);
+engine.registerComponent(CursorTarget);
 engine.registerComponent(FingerCursor);
 engine.registerComponent(HandTracking);
 engine.registerComponent(MouseLookComponent);
@@ -37,6 +40,7 @@ engine.registerComponent(PlayerHeight);
 engine.registerComponent(VrModeActiveSwitch);
 engine.registerComponent(WasdControlsComponent);
 engine.registerComponent(HexGrid);
+engine.registerComponent(TileInteraction);
 engine.registerComponent(TilePrefabs);
 engine.registerComponent(RootUI);
 /* wle:auto-register:end */

@@ -21,7 +21,7 @@ const Constants = {
 const RuntimeOptions = {
     webgl2: true,
     webgpu: false,
-    physx: false,
+    physx: true,
     loader: false,
     xrFramebufferScaleFactor: 1,
     loadUncompressedImagesAsBitmap: false,

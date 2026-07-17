@@ -6,12 +6,16 @@ import * as __wonderlandengine_spatial_audio from '@wonderlandengine/spatial-aud
 _registerEditor(__wonderlandengine_spatial_audio);
 import * as _E__Dev_ManiFestJVRam2_2026_2_js_bootstrap_services_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/bootstrap-services.ts';
 _registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_bootstrap_services_ts);
-import * as _E__Dev_ManiFestJVRam2_2026_2_js_classes_HexagonTile_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/classes/HexagonTile.ts';
-_registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_classes_HexagonTile_ts);
 import * as _E__Dev_ManiFestJVRam2_2026_2_js_components_hex_grid_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/components/hex-grid.ts';
 _registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_components_hex_grid_ts);
+import * as _E__Dev_ManiFestJVRam2_2026_2_js_components_tile_data_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/components/tile-data.ts';
+_registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_components_tile_data_ts);
+import * as _E__Dev_ManiFestJVRam2_2026_2_js_components_tile_interaction_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/components/tile-interaction.ts';
+_registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_components_tile_interaction_ts);
 import * as _E__Dev_ManiFestJVRam2_2026_2_js_components_tile_prefabs_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/components/tile-prefabs.ts';
 _registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_components_tile_prefabs_ts);
+import * as _E__Dev_ManiFestJVRam2_2026_2_js_services_TileInteractionService_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/services/TileInteractionService.ts';
+_registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_services_TileInteractionService_ts);
 import * as _E__Dev_ManiFestJVRam2_2026_2_js_ui_GameServicesProvider_tsx from 'E:/Dev/ManiFestJVRam2-2026_2/js/ui/GameServicesProvider.tsx';
 _registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_ui_GameServicesProvider_tsx);
 import * as _E__Dev_ManiFestJVRam2_2026_2_js_ui_components_main_menu_mainMenu_tsx from 'E:/Dev/ManiFestJVRam2-2026_2/js/ui/components/main-menu/mainMenu.tsx';

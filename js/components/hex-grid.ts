@@ -1,13 +1,18 @@
-import {Component, Object3D} from '@wonderlandengine/api';
+import {Component, Object3D, WonderlandEngine} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {TilePrefabs} from './tile-prefabs.ts';
 import {wlUtils} from '@sorskoot/wonderland-components';
 import {serviceLocator} from '../utils/ServiceLocator.ts';
 import {Services} from '../bootstrap-services.ts';
 import {IGamePlayService} from '../services/GamePlayService.ts';
+import {TileData} from './tile-data.ts';
 
 export class HexGrid extends Component {
     static TypeName = 'hex-grid';
+
+    static onRegister(engine: WonderlandEngine) {
+        engine.registerComponent(TileData);
+    }
 
     @property.object({required: true})
     declare public tilePrefabsObject: Object3D;
@@ -63,7 +68,13 @@ export class HexGrid extends Component {
             }
             const tile = this.gamePlayService.getTile(tileId);
             if (tile) {
-                const newTile = this.tilePrefabs.spawn('Tile')!;
+                let newTile: Object3D;
+                if (tile.type === 'placeholder') {
+                    newTile = this.tilePrefabs.spawn('Placeholder')!;
+                } else {
+                    newTile = this.tilePrefabs.spawn('Tile')!;
+                }
+                newTile.addComponent(TileData, {tileId: tileId});
                 newTile.resetPosition();
                 newTile.parent = this.object;
                 const pos = tile.to2D();

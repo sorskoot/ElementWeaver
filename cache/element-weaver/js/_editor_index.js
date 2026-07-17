@@ -6,18 +6,10 @@ import * as __wonderlandengine_spatial_audio from '@wonderlandengine/spatial-aud
 _registerEditor(__wonderlandengine_spatial_audio);
 import * as _E__Dev_ManiFestJVRam2_2026_2_js_bootstrap_services_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/bootstrap-services.ts';
 _registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_bootstrap_services_ts);
-import * as _E__Dev_ManiFestJVRam2_2026_2_js_classes_HexagonTile_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/classes/HexagonTile.ts';
-_registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_classes_HexagonTile_ts);
 import * as _E__Dev_ManiFestJVRam2_2026_2_js_components_hex_grid_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/components/hex-grid.ts';
 _registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_components_hex_grid_ts);
 import * as _E__Dev_ManiFestJVRam2_2026_2_js_components_tile_prefabs_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/components/tile-prefabs.ts';
 _registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_components_tile_prefabs_ts);
-import * as _E__Dev_ManiFestJVRam2_2026_2_js_models_GameModel_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/models/GameModel.ts';
-_registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_models_GameModel_ts);
-import * as _E__Dev_ManiFestJVRam2_2026_2_js_services_GameFlowService_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/services/GameFlowService.ts';
-_registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_services_GameFlowService_ts);
-import * as _E__Dev_ManiFestJVRam2_2026_2_js_services_GamePlayService_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/services/GamePlayService.ts';
-_registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_services_GamePlayService_ts);
 import * as _E__Dev_ManiFestJVRam2_2026_2_js_ui_GameServicesProvider_tsx from 'E:/Dev/ManiFestJVRam2-2026_2/js/ui/GameServicesProvider.tsx';
 _registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_ui_GameServicesProvider_tsx);
 import * as _E__Dev_ManiFestJVRam2_2026_2_js_ui_components_main_menu_mainMenu_tsx from 'E:/Dev/ManiFestJVRam2-2026_2/js/ui/components/main-menu/mainMenu.tsx';

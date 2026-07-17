@@ -31976,7 +31976,8 @@
     configService: () => configService,
     gameFlowService: () => gameFlowService,
     gamePlayService: () => gamePlayService,
-    registerServices: () => registerServices
+    registerServices: () => registerServices,
+    tileInteractionService: () => tileInteractionService
   });
 
   // js/utils/ServiceLocator.ts
@@ -32002,12 +32003,6 @@
     }
   };
   var serviceLocator = new ServiceLocator2();
-
-  // js/classes/HexagonTile.ts
-  var HexagonTile_exports = {};
-  __export(HexagonTile_exports, {
-    HexagonTile: () => HexagonTile
-  });
 
   // js/classes/Tags.ts
   var _Tags2 = class {
@@ -32808,11 +32803,50 @@
     }
   };
 
+  // js/services/TileInteractionService.ts
+  var TileInteractionService_exports = {};
+  __export(TileInteractionService_exports, {
+    TileInteractionService: () => TileInteractionService
+  });
+  var TileInteractionService = class {
+    constructor(gamePlayService2) {
+      this.gamePlayService = gamePlayService2;
+    }
+    onTileHover = new EventEmitter();
+    onTileClick = new EventEmitter();
+    onTileUnhover = new EventEmitter();
+    currentHoveredTile = y(null);
+    emitTileHover(tileId) {
+      const tile = this.gamePlayService.getTile(tileId);
+      const tilePos = tile?.to2D();
+      if (tilePos && tile) {
+        this.onTileHover.emit(tileId, tilePos, tile);
+        this.currentHoveredTile.value = tile;
+      } else {
+        this.currentHoveredTile.value = null;
+      }
+    }
+    emitTileClick(tileId) {
+      const tile = this.gamePlayService.getTile(tileId);
+      const tilePos = tile?.to2D();
+      if (tilePos && tile) {
+        this.onTileClick.emit(tileId, tilePos, tile);
+        this.currentHoveredTile.value = null;
+        this.currentHoveredTile.value = tile;
+      }
+    }
+    emitTileUnhover(tileId) {
+      this.onTileUnhover.emit(tileId);
+      this.currentHoveredTile.value = null;
+    }
+  };
+
   // js/bootstrap-services.ts
   var Services = {
     configService: Symbol("ConfigService"),
     gamePlayService: Symbol("GamePlayService"),
     gameFlowService: Symbol("GameFlowService"),
+    tileInteractionService: Symbol("TileInteractionService"),
     configModel: Symbol("ConfigModel"),
     gameModel: Symbol("GameModel")
   };
@@ -32821,12 +32855,14 @@
   var configService = new ConfigService(configModel);
   var gamePlayService = new GamePlayService(gameModel);
   var gameFlowService = new GameFlowService(gamePlayService);
+  var tileInteractionService = new TileInteractionService(gamePlayService);
   function registerServices() {
     serviceLocator.registerSingleton(Services.configModel, configModel);
     serviceLocator.registerSingleton(Services.gameModel, gameModel);
     serviceLocator.registerSingleton(Services.configService, configService);
     serviceLocator.registerSingleton(Services.gamePlayService, gamePlayService);
     serviceLocator.registerSingleton(Services.gameFlowService, gameFlowService);
+    serviceLocator.registerSingleton(Services.tileInteractionService, tileInteractionService);
   }
 
   // js/components/hex-grid.ts
@@ -32848,8 +32884,24 @@
   __publicField(TilePrefabs, "TypeName", "tile-prefabs");
   __publicField(TilePrefabs, "InheritProperties", true);
 
+  // js/components/tile-data.ts
+  var tile_data_exports = {};
+  __export(tile_data_exports, {
+    TileData: () => TileData
+  });
+  var TileData = class extends Component3 {
+    tileId = "";
+  };
+  __publicField(TileData, "TypeName", "tile-data");
+  __decorateClass([
+    property.string()
+  ], TileData.prototype, "tileId", 2);
+
   // js/components/hex-grid.ts
   var HexGrid = class extends Component3 {
+    static onRegister(engine) {
+      engine.registerComponent(TileData);
+    }
     get gamePlayService() {
       return serviceLocator.get(Services.gamePlayService);
     }
@@ -32884,7 +32936,13 @@
         }
         const tile = this.gamePlayService.getTile(tileId);
         if (tile) {
-          const newTile = this.tilePrefabs.spawn("Tile");
+          let newTile;
+          if (tile.type === "placeholder") {
+            newTile = this.tilePrefabs.spawn("Placeholder");
+          } else {
+            newTile = this.tilePrefabs.spawn("Tile");
+          }
+          newTile.addComponent(TileData, { tileId });
           newTile.resetPosition();
           newTile.parent = this.object;
           const pos = tile.to2D();
@@ -32899,6 +32957,66 @@
   __decorateClass([
     property.object({ required: true })
   ], HexGrid.prototype, "tilePrefabsObject", 2);
+
+  // js/components/tile-interaction.ts
+  var tile_interaction_exports = {};
+  __export(tile_interaction_exports, {
+    TileInteraction: () => TileInteraction
+  });
+  var TileInteraction = class extends Component3 {
+    cursorTarget;
+    get tileInteractionService() {
+      return serviceLocator.get(Services.tileInteractionService);
+    }
+    start() {
+      this.cursorTarget = this.object.getComponent(CursorTarget);
+      if (!this.cursorTarget) {
+        console.error("TileInteraction component requires a CursorTarget component on the same object.");
+        return;
+      }
+    }
+    onActivate() {
+      if (!this.cursorTarget) {
+        return;
+      }
+      this.cursorTarget.onHover.add(this.onHover);
+      this.cursorTarget.onUnhover.add(this.onUnhover);
+      this.cursorTarget.onClick.add(this.onClick);
+    }
+    onDeactivate() {
+      if (!this.cursorTarget) {
+        return;
+      }
+      this.cursorTarget.onHover.remove(this.onHover);
+      this.cursorTarget.onUnhover.remove(this.onUnhover);
+      this.cursorTarget.onClick.remove(this.onClick);
+    }
+    onHover = (cursor) => {
+      const tileData = this.object.getComponent(TileData);
+      if (!tileData) {
+        console.error("TileInteraction component requires a TileData component on the same object.");
+        return;
+      }
+      this.tileInteractionService.emitTileHover(tileData.tileId);
+    };
+    onUnhover = (cursor) => {
+      const tileData = this.object.getComponent(TileData);
+      if (!tileData) {
+        console.error("TileInteraction component requires a TileData component on the same object.");
+        return;
+      }
+      this.tileInteractionService.emitTileUnhover(tileData.tileId);
+    };
+    onClick = (cursor) => {
+      const tileData = this.object.getComponent(TileData);
+      if (!tileData) {
+        console.error("TileInteraction component requires a TileData component on the same object.");
+        return;
+      }
+      this.tileInteractionService.emitTileClick(tileData.tileId);
+    };
+  };
+  __publicField(TileInteraction, "TypeName", "tile-interaction");
 
   // js/ui/GameServicesProvider.tsx
   var GameServicesProvider_exports = {};
@@ -36503,9 +36621,11 @@
   _registerEditor(dist_exports3);
   _registerEditor(dist_exports2);
   _registerEditor(bootstrap_services_exports);
-  _registerEditor(HexagonTile_exports);
   _registerEditor(hex_grid_exports);
+  _registerEditor(tile_data_exports);
+  _registerEditor(tile_interaction_exports);
   _registerEditor(tile_prefabs_exports);
+  _registerEditor(TileInteractionService_exports);
   _registerEditor(GameServicesProvider_exports);
   _registerEditor(mainMenu_exports);
   _registerEditor(useMenuViewModel_exports);

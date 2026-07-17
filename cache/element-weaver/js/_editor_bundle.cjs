@@ -32003,18 +32003,6 @@
   };
   var serviceLocator = new ServiceLocator2();
 
-  // js/models/GameModel.ts
-  var GameModel_exports = {};
-  __export(GameModel_exports, {
-    GameModel: () => GameModel
-  });
-
-  // js/classes/HexagonTile.ts
-  var HexagonTile_exports = {};
-  __export(HexagonTile_exports, {
-    HexagonTile: () => HexagonTile
-  });
-
   // js/classes/Tags.ts
   var _Tags2 = class {
     _tagList = /* @__PURE__ */ new Map();
@@ -32072,7 +32060,7 @@
   __publicField(Tags2, "_instance");
 
   // js/classes/HexagonTile.ts
-  var TILE_SIZE = 2 / Math.sqrt(3);
+  var TILE_SIZE = 1;
   var HexagonTile = class {
     /**
      * Creates a new HexagonTile instance.
@@ -32266,12 +32254,6 @@
     }
   };
 
-  // js/services/GamePlayService.ts
-  var GamePlayService_exports = {};
-  __export(GamePlayService_exports, {
-    GamePlayService: () => GamePlayService
-  });
-
   // js/utils/Events.ts
   var EventEmitter = class {
     listeners = [];
@@ -32392,13 +32374,6 @@
       return this.gameModel.getTileById(tileId);
     }
   };
-
-  // js/services/GameFlowService.ts
-  var GameFlowService_exports = {};
-  __export(GameFlowService_exports, {
-    GameFlowService: () => GameFlowService,
-    GameState: () => GameState
-  });
 
   // node_modules/@preact/signals-core/dist/signals-core.module.js
   var i = Symbol.for("preact-signals");
@@ -32816,14 +32791,6 @@
   }
 
   // js/services/GameFlowService.ts
-  var GameState = /* @__PURE__ */ ((GameState2) => {
-    GameState2["TitleScreen"] = "title-screen";
-    GameState2["Menu"] = "menu";
-    GameState2["Playing"] = "playing";
-    GameState2["Paused"] = "paused";
-    GameState2["GameOver"] = "game-over";
-    return GameState2;
-  })(GameState || {});
   var GameFlowService = class {
     constructor(gamePlayService2) {
       this.gamePlayService = gamePlayService2;
@@ -32911,7 +32878,12 @@
         }
         const tile = this.gamePlayService.getTile(tileId);
         if (tile) {
-          const newTile = this.tilePrefabs.spawn("Tile");
+          let newTile;
+          if (tile.type === "placeholder") {
+            newTile = this.tilePrefabs.spawn("Placeholder");
+          } else {
+            newTile = this.tilePrefabs.spawn("Tile");
+          }
           newTile.resetPosition();
           newTile.parent = this.object;
           const pos = tile.to2D();
@@ -36530,12 +36502,8 @@
   _registerEditor(dist_exports3);
   _registerEditor(dist_exports2);
   _registerEditor(bootstrap_services_exports);
-  _registerEditor(HexagonTile_exports);
   _registerEditor(hex_grid_exports);
   _registerEditor(tile_prefabs_exports);
-  _registerEditor(GameModel_exports);
-  _registerEditor(GameFlowService_exports);
-  _registerEditor(GamePlayService_exports);
   _registerEditor(GameServicesProvider_exports);
   _registerEditor(mainMenu_exports);
   _registerEditor(useMenuViewModel_exports);
