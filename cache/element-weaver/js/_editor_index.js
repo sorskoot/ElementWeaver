@@ -8,6 +8,12 @@ import * as _E__Dev_ManiFestJVRam2_2026_2_js_bootstrap_services_ts from 'E:/Dev/
 _registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_bootstrap_services_ts);
 import * as _E__Dev_ManiFestJVRam2_2026_2_js_components_hex_grid_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/components/hex-grid.ts';
 _registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_components_hex_grid_ts);
+import * as _E__Dev_ManiFestJVRam2_2026_2_js_components_tile_data_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/components/tile-data.ts';
+_registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_components_tile_data_ts);
+import * as _E__Dev_ManiFestJVRam2_2026_2_js_components_tile_interaction_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/components/tile-interaction.ts';
+_registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_components_tile_interaction_ts);
+import * as _E__Dev_ManiFestJVRam2_2026_2_js_components_tile_materials_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/components/tile-materials.ts';
+_registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_components_tile_materials_ts);
 import * as _E__Dev_ManiFestJVRam2_2026_2_js_components_tile_prefabs_ts from 'E:/Dev/ManiFestJVRam2-2026_2/js/components/tile-prefabs.ts';
 _registerEditor(_E__Dev_ManiFestJVRam2_2026_2_js_components_tile_prefabs_ts);
 import * as _E__Dev_ManiFestJVRam2_2026_2_js_ui_GameServicesProvider_tsx from 'E:/Dev/ManiFestJVRam2-2026_2/js/ui/GameServicesProvider.tsx';

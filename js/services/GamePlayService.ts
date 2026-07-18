@@ -22,6 +22,8 @@ export interface IGamePlayService {
     onTilesChanged: EventEmitter<[string[]]>;
 
     getTile(tileId: string): HexagonTile | undefined;
+
+    placeTile(tile: HexagonTile): void;
 }
 
 export class GamePlayService implements IGamePlayService {
@@ -81,5 +83,17 @@ export class GamePlayService implements IGamePlayService {
 
     getTile(tileId: string): HexagonTile | undefined {
         return this.gameModel.getTileById(tileId);
+    }
+
+    placeTile(tile: HexagonTile): void {
+        const existingTile = this.gameModel.getTileById(tile.id);
+        if (existingTile && existingTile.type === TileType.placeholder) {
+            this.gameModel.addTile(tile.x, tile.y, tile.z, TileType.piece);
+            const changedTileIds: string[] = [tile.id];
+            // surround the newly placed tile with placeholder tiles if empty spots exist
+            const addedPlaceholderIds = this.surroundWithPlaceholders();
+            changedTileIds.push(...addedPlaceholderIds);
+            this.onTilesChanged.emit(changedTileIds);
+        }
     }
 }

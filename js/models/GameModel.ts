@@ -1,6 +1,6 @@
 import {HexagonTile} from '../classes/HexagonTile.ts';
 import {HexagonGrid} from '../classes/HexGrid.ts';
-import {TileType} from '../types/HexTile.ts';
+import {HexTileElements as HexTileData, TileType} from '../types/HexTile.ts';
 
 export interface IGameModel {
     /**
@@ -33,10 +33,14 @@ export interface IGameModel {
      * @returns The HexagonTile with the specified ID, or undefined if no such tile exists.
      */
     getTileById(tileId: string): HexagonTile | undefined;
+
+    tileData: Map<string, HexTileData>;
 }
 
 export class GameModel implements IGameModel {
     private grid: HexagonGrid;
+
+    tileData: Map<string, HexTileData> = new Map();
 
     constructor() {
         this.grid = new HexagonGrid();
@@ -44,6 +48,7 @@ export class GameModel implements IGameModel {
 
     clearGrid(): void {
         this.grid.clear();
+        this.tileData.clear();
     }
 
     getAllTiles(): HexagonTile[] {
@@ -57,7 +62,9 @@ export class GameModel implements IGameModel {
     getTileById(tileId: string): HexagonTile | undefined {
         return this.grid.getTileById(tileId);
     }
-
+    getTileDataById(tileId: string): HexTileData | undefined {
+        return this.tileData.get(tileId);
+    }
     addTile(x: number, y: number, z: number, type: TileType): string {
         const newTile = new HexagonTile(x, y, z, type);
         this.grid.addTile(newTile);

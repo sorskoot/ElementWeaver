@@ -31976,7 +31976,9 @@
     configService: () => configService,
     gameFlowService: () => gameFlowService,
     gamePlayService: () => gamePlayService,
-    registerServices: () => registerServices
+    registerServices: () => registerServices,
+    tileInteractionService: () => tileInteractionService,
+    tilePlayService: () => tilePlayService
   });
 
   // js/utils/ServiceLocator.ts
@@ -32221,11 +32223,13 @@
   // js/models/GameModel.ts
   var GameModel = class {
     grid;
+    tileData = /* @__PURE__ */ new Map();
     constructor() {
       this.grid = new HexagonGrid();
     }
     clearGrid() {
       this.grid.clear();
+      this.tileData.clear();
     }
     getAllTiles() {
       return this.grid.getAllTiles();
@@ -32235,6 +32239,9 @@
     }
     getTileById(tileId) {
       return this.grid.getTileById(tileId);
+    }
+    getTileDataById(tileId) {
+      return this.tileData.get(tileId);
     }
     addTile(x2, y2, z, type) {
       const newTile = new HexagonTile(x2, y2, z, type);
@@ -32372,6 +32379,16 @@
     }
     getTile(tileId) {
       return this.gameModel.getTileById(tileId);
+    }
+    placeTile(tile) {
+      const existingTile = this.gameModel.getTileById(tile.id);
+      if (existingTile && existingTile.type === "placeholder" /* placeholder */) {
+        this.gameModel.addTile(tile.x, tile.y, tile.z, "piece" /* piece */);
+        const changedTileIds = [tile.id];
+        const addedPlaceholderIds = this.surroundWithPlaceholders();
+        changedTileIds.push(...addedPlaceholderIds);
+        this.onTilesChanged.emit(changedTileIds);
+      }
     }
   };
 
@@ -32802,11 +32819,62 @@
     }
   };
 
+  // js/services/TileInteractionService.ts
+  var TileInteractionService = class {
+    constructor(gamePlayService2) {
+      this.gamePlayService = gamePlayService2;
+    }
+    onTileHover = new EventEmitter();
+    onTileClick = new EventEmitter();
+    onTileUnhover = new EventEmitter();
+    currentHoveredTile = y(null);
+    emitTileHover(tileId) {
+      const tile = this.gamePlayService.getTile(tileId);
+      const tilePos = tile?.to2D();
+      if (tilePos && tile) {
+        this.onTileHover.emit(tileId, tilePos, tile);
+        this.currentHoveredTile.value = tile;
+      } else {
+        this.currentHoveredTile.value = null;
+      }
+    }
+    emitTileClick(tileId) {
+      const tile = this.gamePlayService.getTile(tileId);
+      const tilePos = tile?.to2D();
+      if (tilePos && tile) {
+        this.onTileClick.emit(tileId, tilePos, tile);
+        this.currentHoveredTile.value = null;
+        this.currentHoveredTile.value = tile;
+      }
+    }
+    emitTileUnhover(tileId) {
+      this.onTileUnhover.emit(tileId);
+      this.currentHoveredTile.value = null;
+    }
+  };
+
+  // js/services/TilePlayService.ts
+  var TilePlayService = class {
+    constructor(gamePlayService2, tileInteractionService2) {
+      this.gamePlayService = gamePlayService2;
+      this.tileInteractionService = tileInteractionService2;
+      this.tileInteractionService.onTileClick.add(this.onTileClick);
+    }
+    onTileClick = (tileId) => {
+      const tile = this.gamePlayService.getTile(tileId);
+      if (tile) {
+        this.gamePlayService.placeTile(tile);
+      }
+    };
+  };
+
   // js/bootstrap-services.ts
   var Services = {
     configService: Symbol("ConfigService"),
     gamePlayService: Symbol("GamePlayService"),
     gameFlowService: Symbol("GameFlowService"),
+    tileInteractionService: Symbol("TileInteractionService"),
+    tilePlayService: Symbol("TilePlayService"),
     configModel: Symbol("ConfigModel"),
     gameModel: Symbol("GameModel")
   };
@@ -32815,12 +32883,16 @@
   var configService = new ConfigService(configModel);
   var gamePlayService = new GamePlayService(gameModel);
   var gameFlowService = new GameFlowService(gamePlayService);
+  var tileInteractionService = new TileInteractionService(gamePlayService);
+  var tilePlayService = new TilePlayService(gamePlayService, tileInteractionService);
   function registerServices() {
     serviceLocator.registerSingleton(Services.configModel, configModel);
     serviceLocator.registerSingleton(Services.gameModel, gameModel);
     serviceLocator.registerSingleton(Services.configService, configService);
     serviceLocator.registerSingleton(Services.gamePlayService, gamePlayService);
     serviceLocator.registerSingleton(Services.gameFlowService, gameFlowService);
+    serviceLocator.registerSingleton(Services.tileInteractionService, tileInteractionService);
+    serviceLocator.registerSingleton(Services.tilePlayService, tilePlayService);
   }
 
   // js/components/hex-grid.ts
@@ -32842,8 +32914,24 @@
   __publicField(TilePrefabs, "TypeName", "tile-prefabs");
   __publicField(TilePrefabs, "InheritProperties", true);
 
+  // js/components/tile-data.ts
+  var tile_data_exports = {};
+  __export(tile_data_exports, {
+    TileData: () => TileData
+  });
+  var TileData = class extends Component3 {
+    tileId = "";
+  };
+  __publicField(TileData, "TypeName", "tile-data");
+  __decorateClass([
+    property.string()
+  ], TileData.prototype, "tileId", 2);
+
   // js/components/hex-grid.ts
   var HexGrid = class extends Component3 {
+    static onRegister(engine) {
+      engine.registerComponent(TileData);
+    }
     get gamePlayService() {
       return serviceLocator.get(Services.gamePlayService);
     }
@@ -32884,6 +32972,7 @@
           } else {
             newTile = this.tilePrefabs.spawn("Tile");
           }
+          newTile.addComponent(TileData, { tileId });
           newTile.resetPosition();
           newTile.parent = this.object;
           const pos = tile.to2D();
@@ -32898,6 +32987,133 @@
   __decorateClass([
     property.object({ required: true })
   ], HexGrid.prototype, "tilePrefabsObject", 2);
+
+  // js/components/tile-interaction.ts
+  var tile_interaction_exports = {};
+  __export(tile_interaction_exports, {
+    TileInteraction: () => TileInteraction
+  });
+  var TileInteraction = class extends Component3 {
+    cursorTarget;
+    get tileInteractionService() {
+      return serviceLocator.get(Services.tileInteractionService);
+    }
+    start() {
+      this.cursorTarget = this.object.getComponent(CursorTarget);
+      if (!this.cursorTarget) {
+        console.error("TileInteraction component requires a CursorTarget component on the same object.");
+        return;
+      }
+    }
+    onActivate() {
+      if (!this.cursorTarget) {
+        return;
+      }
+      this.cursorTarget.onHover.add(this.onHover);
+      this.cursorTarget.onUnhover.add(this.onUnhover);
+      this.cursorTarget.onClick.add(this.onClick);
+    }
+    onDeactivate() {
+      if (!this.cursorTarget) {
+        return;
+      }
+      this.cursorTarget.onHover.remove(this.onHover);
+      this.cursorTarget.onUnhover.remove(this.onUnhover);
+      this.cursorTarget.onClick.remove(this.onClick);
+    }
+    onHover = (cursor) => {
+      const tileData = this.object.getComponent(TileData);
+      if (!tileData) {
+        console.error("TileInteraction component requires a TileData component on the same object.");
+        return;
+      }
+      this.tileInteractionService.emitTileHover(tileData.tileId);
+    };
+    onUnhover = (cursor) => {
+      const tileData = this.object.getComponent(TileData);
+      if (!tileData) {
+        console.error("TileInteraction component requires a TileData component on the same object.");
+        return;
+      }
+      this.tileInteractionService.emitTileUnhover(tileData.tileId);
+    };
+    onClick = (cursor) => {
+      const tileData = this.object.getComponent(TileData);
+      if (!tileData) {
+        console.error("TileInteraction component requires a TileData component on the same object.");
+        return;
+      }
+      this.tileInteractionService.emitTileClick(tileData.tileId);
+    };
+  };
+  __publicField(TileInteraction, "TypeName", "tile-interaction");
+
+  // js/components/tile-materials.ts
+  var tile_materials_exports = {};
+  __export(tile_materials_exports, {
+    TileMaterials: () => TileMaterials
+  });
+  var TileMaterials = class extends Component3 {
+    fireMaterial;
+    waterMaterial;
+    earthMaterial;
+    airMaterial;
+    spiritMaterial;
+    slices;
+    start() {
+      this.slices = [
+        this.object.findByNameRecursive("Slice1")[0],
+        this.object.findByNameRecursive("Slice2")[0],
+        this.object.findByNameRecursive("Slice3")[0],
+        this.object.findByNameRecursive("Slice4")[0],
+        this.object.findByNameRecursive("Slice5")[0],
+        this.object.findByNameRecursive("Slice6")[0]
+      ];
+    }
+    setMaterials(types) {
+      for (let i2 = 0; i2 < this.slices.length; i2++) {
+        const slice = this.slices[i2];
+        const type = types[i2];
+        let material;
+        switch (type) {
+          case "fire" /* fire */:
+            material = this.fireMaterial;
+            break;
+          case "water" /* water */:
+            material = this.waterMaterial;
+            break;
+          case "earth" /* earth */:
+            material = this.earthMaterial;
+            break;
+          case "air" /* air */:
+            material = this.airMaterial;
+            break;
+          case "spirit" /* spirit */:
+            material = this.spiritMaterial;
+            break;
+        }
+        if (material) {
+          slice.getComponent(MeshComponent).material = material;
+        }
+      }
+    }
+  };
+  __publicField(TileMaterials, "TypeName", "tile-materials");
+  __decorateClass([
+    property.material()
+  ], TileMaterials.prototype, "fireMaterial", 2);
+  __decorateClass([
+    property.material()
+  ], TileMaterials.prototype, "waterMaterial", 2);
+  __decorateClass([
+    property.material()
+  ], TileMaterials.prototype, "earthMaterial", 2);
+  __decorateClass([
+    property.material()
+  ], TileMaterials.prototype, "airMaterial", 2);
+  __decorateClass([
+    property.material()
+  ], TileMaterials.prototype, "spiritMaterial", 2);
 
   // js/ui/GameServicesProvider.tsx
   var GameServicesProvider_exports = {};
@@ -36503,6 +36719,9 @@
   _registerEditor(dist_exports2);
   _registerEditor(bootstrap_services_exports);
   _registerEditor(hex_grid_exports);
+  _registerEditor(tile_data_exports);
+  _registerEditor(tile_interaction_exports);
+  _registerEditor(tile_materials_exports);
   _registerEditor(tile_prefabs_exports);
   _registerEditor(GameServicesProvider_exports);
   _registerEditor(mainMenu_exports);

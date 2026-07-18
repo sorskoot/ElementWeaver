@@ -31977,7 +31977,8 @@
     gameFlowService: () => gameFlowService,
     gamePlayService: () => gamePlayService,
     registerServices: () => registerServices,
-    tileInteractionService: () => tileInteractionService
+    tileInteractionService: () => tileInteractionService,
+    tilePlayService: () => tilePlayService
   });
 
   // js/utils/ServiceLocator.ts
@@ -32003,6 +32004,38 @@
     }
   };
   var serviceLocator = new ServiceLocator2();
+
+  // js/models/GameModel.ts
+  var GameModel_exports = {};
+  __export(GameModel_exports, {
+    GameModel: () => GameModel
+  });
+
+  // js/classes/HexagonTile.ts
+  var HexagonTile_exports = {};
+  __export(HexagonTile_exports, {
+    HexagonTile: () => HexagonTile
+  });
+
+  // js/types/HexTile.ts
+  var HexTile_exports = {};
+  __export(HexTile_exports, {
+    TileElementType: () => TileElementType,
+    TileType: () => TileType
+  });
+  var TileType = /* @__PURE__ */ ((TileType3) => {
+    TileType3["placeholder"] = "placeholder";
+    TileType3["piece"] = "piece";
+    return TileType3;
+  })(TileType || {});
+  var TileElementType = /* @__PURE__ */ ((TileElementType2) => {
+    TileElementType2["fire"] = "fire";
+    TileElementType2["water"] = "water";
+    TileElementType2["earth"] = "earth";
+    TileElementType2["air"] = "air";
+    TileElementType2["spirit"] = "spirit";
+    return TileElementType2;
+  })(TileElementType || {});
 
   // js/classes/Tags.ts
   var _Tags2 = class {
@@ -32222,11 +32255,13 @@
   // js/models/GameModel.ts
   var GameModel = class {
     grid;
+    tileData = /* @__PURE__ */ new Map();
     constructor() {
       this.grid = new HexagonGrid();
     }
     clearGrid() {
       this.grid.clear();
+      this.tileData.clear();
     }
     getAllTiles() {
       return this.grid.getAllTiles();
@@ -32236,6 +32271,9 @@
     }
     getTileById(tileId) {
       return this.grid.getTileById(tileId);
+    }
+    getTileDataById(tileId) {
+      return this.tileData.get(tileId);
     }
     addTile(x2, y2, z, type) {
       const newTile = new HexagonTile(x2, y2, z, type);
@@ -32373,6 +32411,16 @@
     }
     getTile(tileId) {
       return this.gameModel.getTileById(tileId);
+    }
+    placeTile(tile) {
+      const existingTile = this.gameModel.getTileById(tile.id);
+      if (existingTile && existingTile.type === "placeholder" /* placeholder */) {
+        this.gameModel.addTile(tile.x, tile.y, tile.z, "piece" /* piece */);
+        const changedTileIds = [tile.id];
+        const addedPlaceholderIds = this.surroundWithPlaceholders();
+        changedTileIds.push(...addedPlaceholderIds);
+        this.onTilesChanged.emit(changedTileIds);
+      }
     }
   };
 
@@ -32804,10 +32852,6 @@
   };
 
   // js/services/TileInteractionService.ts
-  var TileInteractionService_exports = {};
-  __export(TileInteractionService_exports, {
-    TileInteractionService: () => TileInteractionService
-  });
   var TileInteractionService = class {
     constructor(gamePlayService2) {
       this.gamePlayService = gamePlayService2;
@@ -32841,12 +32885,28 @@
     }
   };
 
+  // js/services/TilePlayService.ts
+  var TilePlayService = class {
+    constructor(gamePlayService2, tileInteractionService2) {
+      this.gamePlayService = gamePlayService2;
+      this.tileInteractionService = tileInteractionService2;
+      this.tileInteractionService.onTileClick.add(this.onTileClick);
+    }
+    onTileClick = (tileId) => {
+      const tile = this.gamePlayService.getTile(tileId);
+      if (tile) {
+        this.gamePlayService.placeTile(tile);
+      }
+    };
+  };
+
   // js/bootstrap-services.ts
   var Services = {
     configService: Symbol("ConfigService"),
     gamePlayService: Symbol("GamePlayService"),
     gameFlowService: Symbol("GameFlowService"),
     tileInteractionService: Symbol("TileInteractionService"),
+    tilePlayService: Symbol("TilePlayService"),
     configModel: Symbol("ConfigModel"),
     gameModel: Symbol("GameModel")
   };
@@ -32856,6 +32916,7 @@
   var gamePlayService = new GamePlayService(gameModel);
   var gameFlowService = new GameFlowService(gamePlayService);
   var tileInteractionService = new TileInteractionService(gamePlayService);
+  var tilePlayService = new TilePlayService(gamePlayService, tileInteractionService);
   function registerServices() {
     serviceLocator.registerSingleton(Services.configModel, configModel);
     serviceLocator.registerSingleton(Services.gameModel, gameModel);
@@ -32863,6 +32924,7 @@
     serviceLocator.registerSingleton(Services.gamePlayService, gamePlayService);
     serviceLocator.registerSingleton(Services.gameFlowService, gameFlowService);
     serviceLocator.registerSingleton(Services.tileInteractionService, tileInteractionService);
+    serviceLocator.registerSingleton(Services.tilePlayService, tilePlayService);
   }
 
   // js/components/hex-grid.ts
@@ -33017,6 +33079,79 @@
     };
   };
   __publicField(TileInteraction, "TypeName", "tile-interaction");
+
+  // js/components/tile-materials.ts
+  var tile_materials_exports = {};
+  __export(tile_materials_exports, {
+    TileMaterials: () => TileMaterials
+  });
+  var TileMaterials = class extends Component3 {
+    fireMaterial;
+    waterMaterial;
+    earthMaterial;
+    airMaterial;
+    spiritMaterial;
+    slices;
+    start() {
+      this.slices = [
+        this.object.findByNameRecursive("Slice1")[0],
+        this.object.findByNameRecursive("Slice2")[0],
+        this.object.findByNameRecursive("Slice3")[0],
+        this.object.findByNameRecursive("Slice4")[0],
+        this.object.findByNameRecursive("Slice5")[0],
+        this.object.findByNameRecursive("Slice6")[0]
+      ];
+    }
+    setMaterials(types) {
+      for (let i2 = 0; i2 < this.slices.length; i2++) {
+        const slice = this.slices[i2];
+        const type = types[i2];
+        let material;
+        switch (type) {
+          case "fire" /* fire */:
+            material = this.fireMaterial;
+            break;
+          case "water" /* water */:
+            material = this.waterMaterial;
+            break;
+          case "earth" /* earth */:
+            material = this.earthMaterial;
+            break;
+          case "air" /* air */:
+            material = this.airMaterial;
+            break;
+          case "spirit" /* spirit */:
+            material = this.spiritMaterial;
+            break;
+        }
+        if (material) {
+          slice.getComponent(MeshComponent).material = material;
+        }
+      }
+    }
+  };
+  __publicField(TileMaterials, "TypeName", "tile-materials");
+  __decorateClass([
+    property.material()
+  ], TileMaterials.prototype, "fireMaterial", 2);
+  __decorateClass([
+    property.material()
+  ], TileMaterials.prototype, "waterMaterial", 2);
+  __decorateClass([
+    property.material()
+  ], TileMaterials.prototype, "earthMaterial", 2);
+  __decorateClass([
+    property.material()
+  ], TileMaterials.prototype, "airMaterial", 2);
+  __decorateClass([
+    property.material()
+  ], TileMaterials.prototype, "spiritMaterial", 2);
+
+  // js/types/Rotation.ts
+  var Rotation_exports = {};
+
+  // js/types/Six.ts
+  var Six_exports = {};
 
   // js/ui/GameServicesProvider.tsx
   var GameServicesProvider_exports = {};
@@ -36616,20 +36751,38 @@
   __publicField(RootUI, "TypeName", "root-ui");
   __publicField(RootUI, "InheritProperties", true);
 
+  // js/utils/EWUtils.ts
+  var EWUtils_exports = {};
+  __export(EWUtils_exports, {
+    EWUtils: () => EWUtils
+  });
+  function rotationToDegrees(rotation) {
+    return rotation * 60;
+  }
+  var EWUtils = {
+    rotationToDegrees
+  };
+
   // cache/tiles/js/_editor_index.js
   _registerEditor(dist_exports);
   _registerEditor(dist_exports3);
   _registerEditor(dist_exports2);
   _registerEditor(bootstrap_services_exports);
+  _registerEditor(HexagonTile_exports);
   _registerEditor(hex_grid_exports);
   _registerEditor(tile_data_exports);
   _registerEditor(tile_interaction_exports);
+  _registerEditor(tile_materials_exports);
   _registerEditor(tile_prefabs_exports);
-  _registerEditor(TileInteractionService_exports);
+  _registerEditor(GameModel_exports);
+  _registerEditor(HexTile_exports);
+  _registerEditor(Rotation_exports);
+  _registerEditor(Six_exports);
   _registerEditor(GameServicesProvider_exports);
   _registerEditor(mainMenu_exports);
   _registerEditor(useMenuViewModel_exports);
   _registerEditor(root_ui_exports);
+  _registerEditor(EWUtils_exports);
 })();
 /*! Bundled license information:
 

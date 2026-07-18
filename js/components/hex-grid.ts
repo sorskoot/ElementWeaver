@@ -6,6 +6,7 @@ import {serviceLocator} from '../utils/ServiceLocator.ts';
 import {Services} from '../bootstrap-services.ts';
 import {IGamePlayService} from '../services/GamePlayService.ts';
 import {TileData} from './tile-data.ts';
+import { TileMaterials } from './tile-materials.ts';
 
 export class HexGrid extends Component {
     static TypeName = 'hex-grid';
@@ -73,6 +74,7 @@ export class HexGrid extends Component {
                     newTile = this.tilePrefabs.spawn('Placeholder')!;
                 } else {
                     newTile = this.tilePrefabs.spawn('Tile')!;
+                    //newTile.getComponent(TileMaterials)!.setMaterials(tile.elements);
                 }
                 newTile.addComponent(TileData, {tileId: tileId});
                 newTile.resetPosition();

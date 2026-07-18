@@ -1,4 +1,6 @@
-import {TileType} from '../types/HexTile.ts';
+
+import { TileType} from '../types/HexTile.ts';
+
 import {Tags} from './Tags.ts';
 
 const TILE_SIZE = 1; //1 / Math.sqrt(3);
@@ -11,7 +13,6 @@ export class HexagonTile {
     public get id(): string {
         return this._id;
     }
-
     /**
      * Creates a new HexagonTile instance.
      * @param x - The x-coordinate in cube coordinates.

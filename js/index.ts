@@ -23,6 +23,7 @@ import {VrModeActiveSwitch} from '@wonderlandengine/components';
 import {WasdControlsComponent} from '@wonderlandengine/components';
 import {HexGrid} from './components/hex-grid.js';
 import {TileInteraction} from './components/tile-interaction.js';
+import {TileMaterials} from './components/tile-materials.js';
 import {TilePrefabs} from './components/tile-prefabs.js';
 import {RootUI} from './ui/root-ui.tsx';
 /* wle:auto-imports:end */
@@ -41,6 +42,7 @@ engine.registerComponent(VrModeActiveSwitch);
 engine.registerComponent(WasdControlsComponent);
 engine.registerComponent(HexGrid);
 engine.registerComponent(TileInteraction);
+engine.registerComponent(TileMaterials);
 engine.registerComponent(TilePrefabs);
 engine.registerComponent(RootUI);
 /* wle:auto-register:end */
