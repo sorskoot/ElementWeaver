@@ -152,7 +152,7 @@
                 -1.6599016
             ],
             "rotation": [
-                0.3505289,
+                0.3505288,
                 0.5148388,
                 -0.3505288,
                 0.6994282
@@ -675,10 +675,11 @@
                 {
                     "type": "cursor",
                     "cursor": {
-                        "cursorObject": null,
+                        "cursorObject": "127",
                         "collisionGroup": 0,
                         "cursorRayObject": "209",
-                        "cursorRayScalingAxis": "y"
+                        "cursorRayScalingAxis": "y",
+                        "rayCastMode": "physx"
                     }
                 },
                 {
@@ -1409,10 +1410,11 @@
                 {
                     "type": "cursor",
                     "cursor": {
-                        "cursorObject": null,
+                        "cursorObject": "240",
                         "collisionGroup": 0,
                         "cursorRayObject": "213",
-                        "cursorRayScalingAxis": "y"
+                        "cursorRayScalingAxis": "y",
+                        "rayCastMode": "physx"
                     }
                 },
                 {
@@ -1619,6 +1621,93 @@
                 0.0,
                 -10000.0,
                 0.0
+            ]
+        },
+        "238": {
+            "name": "InputHelper",
+            "parent": "14",
+            "components": [
+                {
+                    "type": "input-helper",
+                    "input-helper": {
+                        "leftControllerObject": "130",
+                        "rightControllerObject": "129"
+                    }
+                }
+            ]
+        },
+        "239": {
+            "name": "TilePreview",
+            "components": [
+                {
+                    "type": "tile-preview",
+                    "tile-preview": {
+                        "tilePrefabsObject": "208"
+                    }
+                }
+            ],
+            "scaling": [
+                0.15,
+                0.15,
+                0.15
+            ]
+        },
+        "127": {
+            "name": "3DCursorHitLeft",
+            "translation": [
+                0.0,
+                0.0388116,
+                1.5585093
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.0099999,
+                0.0099999,
+                0.0099999
+            ],
+            "parent": null,
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "128",
+                        "mesh": "9"
+                    }
+                }
+            ]
+        },
+        "240": {
+            "name": "3DCursorHitRight",
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.0099999,
+                0.0099999,
+                0.0099999
+            ],
+            "parent": null,
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "128",
+                        "mesh": "9"
+                    }
+                }
             ]
         }
     },

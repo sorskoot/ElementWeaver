@@ -1,6 +1,6 @@
 import {HexagonTile} from '../classes/HexagonTile.ts';
 import {IGameModel} from '../models/GameModel.ts';
-import {HexTileElements, TileType} from '../types/HexTile.ts';
+import {HexTileElements, HexTilePiece, TileType} from '../types/HexTile.ts';
 import {EventEmitter} from '../utils/Events.ts';
 import {IElementDistributionService} from './ElementDistributionService.ts';
 
@@ -10,6 +10,12 @@ export interface IGamePlayService {
      * Emits the onNewGame event and the onTilesChanged event with the IDs of the changed tiles.
      */
     newGame(): void;
+
+    getTile(tileId: string): HexagonTile | undefined;
+
+    placeTile(tile: HexagonTile): void;
+
+    getTileDataById(tileId: string): HexTileElements | undefined;
 
     /**
      * Event emitted when a new game is started.
@@ -22,21 +28,20 @@ export interface IGamePlayService {
      */
     onTilesChanged: EventEmitter<[string[]]>;
 
-    getTile(tileId: string): HexagonTile | undefined;
-
-    placeTile(tile: HexagonTile): void;
-
-    getTileDataById(tileId: string): HexTileElements | undefined;
+    onTilePreviewChanged: EventEmitter<[HexTilePiece]>;
 }
 
 export class GamePlayService implements IGamePlayService {
+    onNewGame = new EventEmitter<[]>();
+    onTilesChanged = new EventEmitter<[string[]]>();
+    onTilePreviewChanged = new EventEmitter<[HexTilePiece]>();
+
+    private nextTile?: HexTilePiece;
+
     constructor(
         private elementDistributionService: IElementDistributionService,
         private gameModel: IGameModel
     ) {}
-
-    onNewGame = new EventEmitter<[]>();
-    onTilesChanged = new EventEmitter<[string[]]>();
 
     newGame(): void {
         console.log('Starting a new game...');
@@ -58,6 +63,17 @@ export class GamePlayService implements IGamePlayService {
         changedTileIds.push(...addedPlaceholderIds);
 
         this.onTilesChanged.emit(changedTileIds);
+    }
+
+    createNextTilePreview(): void {
+        const tileData = this.elementDistributionService.createRandomElementDistribution();
+        this.nextTile = {
+            id: `next-tile-preview-${Date.now()}`,
+            type: TileType.piece,
+            elements: tileData,
+            rotation: 0,
+        };
+        this.onTilePreviewChanged.emit(this.nextTile);
     }
 
     /**

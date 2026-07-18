@@ -32006,6 +32006,26 @@
   };
   var serviceLocator = new ServiceLocator2();
 
+  // js/types/HexTile.ts
+  var HexTile_exports = {};
+  __export(HexTile_exports, {
+    TileElementType: () => TileElementType,
+    TileType: () => TileType
+  });
+  var TileType = /* @__PURE__ */ ((TileType3) => {
+    TileType3["placeholder"] = "placeholder";
+    TileType3["piece"] = "piece";
+    return TileType3;
+  })(TileType || {});
+  var TileElementType = /* @__PURE__ */ ((TileElementType2) => {
+    TileElementType2["fire"] = "fire";
+    TileElementType2["water"] = "water";
+    TileElementType2["earth"] = "earth";
+    TileElementType2["air"] = "air";
+    TileElementType2["spirit"] = "spirit";
+    return TileElementType2;
+  })(TileElementType || {});
+
   // js/classes/Tags.ts
   var _Tags2 = class {
     _tagList = /* @__PURE__ */ new Map();
@@ -32351,6 +32371,8 @@
     }
     onNewGame = new EventEmitter();
     onTilesChanged = new EventEmitter();
+    onTilePreviewChanged = new EventEmitter();
+    nextTile;
     newGame() {
       console.log("Starting a new game...");
       this.gameModel.clearGrid();
@@ -32366,6 +32388,16 @@
       const addedPlaceholderIds = this.surroundWithPlaceholders();
       changedTileIds.push(...addedPlaceholderIds);
       this.onTilesChanged.emit(changedTileIds);
+    }
+    createNextTilePreview() {
+      const tileData = this.elementDistributionService.createRandomElementDistribution();
+      this.nextTile = {
+        id: `next-tile-preview-${Date.now()}`,
+        type: "piece" /* piece */,
+        elements: tileData,
+        rotation: 0
+      };
+      this.onTilePreviewChanged.emit(this.nextTile);
     }
     /**
      * Surrounds all piece tiles with placeholder tiles if empty spots exist.
@@ -33117,6 +33149,25 @@
     property.object({ required: true })
   ], HexGrid.prototype, "tilePrefabsObject", 2);
 
+  // js/components/input-helper.ts
+  var input_helper_exports = {};
+  __export(input_helper_exports, {
+    InputHelper: () => InputHelper
+  });
+  var InputHelper = class extends Component3 {
+    leftControllerObject;
+    rightControllerObject;
+    start() {
+    }
+  };
+  __publicField(InputHelper, "TypeName", "input-helper");
+  __decorateClass([
+    property.object({ required: true })
+  ], InputHelper.prototype, "leftControllerObject", 2);
+  __decorateClass([
+    property.object({ required: true })
+  ], InputHelper.prototype, "rightControllerObject", 2);
+
   // js/components/tile-interaction.ts
   var tile_interaction_exports = {};
   __export(tile_interaction_exports, {
@@ -33176,6 +33227,79 @@
     };
   };
   __publicField(TileInteraction, "TypeName", "tile-interaction");
+
+  // js/components/tile-preview.ts
+  var tile_preview_exports = {};
+  __export(tile_preview_exports, {
+    TilePreview: () => TilePreview
+  });
+  var TilePreview = class extends Component3 {
+    previewTileObject;
+    previewMaterials;
+    get gamePlayService() {
+      return serviceLocator.get(Services.gamePlayService);
+    }
+    get tileInteractionService() {
+      return serviceLocator.get(Services.tileInteractionService);
+    }
+    defaultScale = [1, 1, 1];
+    currentPos = vec3_exports.create();
+    start() {
+      this.tilePrefabs = this.tilePrefabsObject.getComponent(TilePrefabs);
+    }
+    onActivate() {
+      this.gamePlayService.onTilePreviewChanged.add(this.onTilePreviewChanged);
+      this.tileInteractionService.onTileHover.add(this.onTileHover);
+      this.tileInteractionService.onTileClick.add(this.onTileUnhover);
+      this.tileInteractionService.onTileUnhover.add(this.onTileUnhover);
+    }
+    onDeactivate() {
+      this.gamePlayService.onTilePreviewChanged.remove(this.onTilePreviewChanged);
+      this.tileInteractionService.onTileHover.remove(this.onTileHover);
+      this.tileInteractionService.onTileClick.remove(this.onTileUnhover);
+      this.tileInteractionService.onTileUnhover.remove(this.onTileUnhover);
+    }
+    v = 0;
+    update(dt) {
+      if (!this.previewTileObject) {
+        return;
+      }
+      this.currentPos[1] = Math.sin(this.v * 10) * 0.05 + 0.2;
+      this.previewTileObject.setPositionLocal(this.currentPos);
+      this.v += dt;
+    }
+    onTilePreviewChanged = (tileData) => {
+      if (!this.previewTileObject) {
+        return;
+      }
+      this.previewMaterials?.setMaterials(tileData.elements);
+    };
+    onTileHover = (tileId, tilePos) => {
+      if (!this.previewTileObject) {
+        this.createPreviewTileObject();
+      }
+      this.previewTileObject.setScalingLocal(this.defaultScale);
+      this.currentPos = [tilePos.x, 0.2, tilePos.y];
+      this.previewTileObject.setPositionLocal(this.currentPos);
+    };
+    onTileUnhover = (tileId) => {
+      if (!this.previewTileObject) {
+        this.createPreviewTileObject();
+      }
+      this.previewTileObject.setScalingWorld([0, 0, 0]);
+    };
+    createPreviewTileObject() {
+      this.previewTileObject = this.tilePrefabs.spawn("Tile");
+      this.previewMaterials = this.previewTileObject.getComponent(TileMaterials);
+      this.previewTileObject.resetPosition();
+      this.previewTileObject.parent = this.object;
+      this.previewTileObject.setScalingWorld([0, 0, 0]);
+    }
+  };
+  __publicField(TilePreview, "TypeName", "tile-preview");
+  __decorateClass([
+    property.object({ required: true })
+  ], TilePreview.prototype, "tilePrefabsObject", 2);
 
   // js/ui/GameServicesProvider.tsx
   var GameServicesProvider_exports = {};
@@ -36781,12 +36905,15 @@
   _registerEditor(dist_exports2);
   _registerEditor(bootstrap_services_exports);
   _registerEditor(hex_grid_exports);
+  _registerEditor(input_helper_exports);
   _registerEditor(tile_data_exports);
   _registerEditor(tile_interaction_exports);
   _registerEditor(tile_materials_exports);
   _registerEditor(tile_prefabs_exports);
+  _registerEditor(tile_preview_exports);
   _registerEditor(ElementDistributionService_exports);
   _registerEditor(GamePlayService_exports);
+  _registerEditor(HexTile_exports);
   _registerEditor(GameServicesProvider_exports);
   _registerEditor(mainMenu_exports);
   _registerEditor(useMenuViewModel_exports);
