@@ -1,7 +1,8 @@
 import {HexagonTile} from '../classes/HexagonTile.ts';
 import {IGameModel} from '../models/GameModel.ts';
-import {TileType} from '../types/HexTile.ts';
+import {HexTileElements, TileType} from '../types/HexTile.ts';
 import {EventEmitter} from '../utils/Events.ts';
+import {IElementDistributionService} from './ElementDistributionService.ts';
 
 export interface IGamePlayService {
     /**
@@ -24,10 +25,15 @@ export interface IGamePlayService {
     getTile(tileId: string): HexagonTile | undefined;
 
     placeTile(tile: HexagonTile): void;
+
+    getTileDataById(tileId: string): HexTileElements | undefined;
 }
 
 export class GamePlayService implements IGamePlayService {
-    constructor(private gameModel: IGameModel) {}
+    constructor(
+        private elementDistributionService: IElementDistributionService,
+        private gameModel: IGameModel
+    ) {}
 
     onNewGame = new EventEmitter<[]>();
     onTilesChanged = new EventEmitter<[string[]]>();
@@ -39,7 +45,12 @@ export class GamePlayService implements IGamePlayService {
 
         const changedTileIds: string[] = [];
         // Add a randomized tile to the center of the grid
-        const addedTileId = this.gameModel.addTile(0, 0, 0, TileType.piece);
+        const addedTileId = this.gameModel.addTile(0, 0, 0, {
+            id: '0,0,0',
+            type: TileType.piece,
+            elements: this.elementDistributionService.createRandomElementDistribution(false),
+            rotation: 0,
+        });
         changedTileIds.push(addedTileId);
 
         // surround the center tile with 6 placeholder tiles
@@ -66,12 +77,10 @@ export class GamePlayService implements IGamePlayService {
                     if (!neighborTile) {
                         // there's an empty spot next to a tile,
                         // so we should add a placeholder tile there
-                        const addedTileId = this.gameModel.addTile(
-                            neighbor.x,
-                            neighbor.y,
-                            neighbor.z,
-                            TileType.placeholder
-                        );
+                        const addedTileId = this.gameModel.addTile(neighbor.x, neighbor.y, neighbor.z, {
+                            id: `${neighbor.x},${neighbor.y},${neighbor.z}`,
+                            type: TileType.placeholder,
+                        });
 
                         addedTileIds.push(addedTileId);
                     }
@@ -88,12 +97,22 @@ export class GamePlayService implements IGamePlayService {
     placeTile(tile: HexagonTile): void {
         const existingTile = this.gameModel.getTileById(tile.id);
         if (existingTile && existingTile.type === TileType.placeholder) {
-            this.gameModel.addTile(tile.x, tile.y, tile.z, TileType.piece);
+            const elements = this.elementDistributionService.createRandomElementDistribution();
+            this.gameModel.addTile(tile.x, tile.y, tile.z, {
+                id: `${tile.x},${tile.y},${tile.z}`,
+                type: TileType.piece,
+                elements: elements,
+                rotation: 0,
+            });
             const changedTileIds: string[] = [tile.id];
             // surround the newly placed tile with placeholder tiles if empty spots exist
             const addedPlaceholderIds = this.surroundWithPlaceholders();
             changedTileIds.push(...addedPlaceholderIds);
             this.onTilesChanged.emit(changedTileIds);
         }
+    }
+
+    getTileDataById(tileId: string): HexTileElements | undefined {
+        return this.gameModel.getTileDataById(tileId);
     }
 }

@@ -1,16 +1,17 @@
-import { rng, wlUtils } from '@sorskoot/wonderland-components';
-import { Component, Material, MeshComponent, Object3D, Property } from '@wonderlandengine/api';
-import { property } from '@wonderlandengine/api/decorators.js';
-import { TileElementType, TileType } from '../types/HexTile.ts';
+import {rng, wlUtils} from '@sorskoot/wonderland-components';
+import {Component, Material, MeshComponent, Object3D, Property} from '@wonderlandengine/api';
+import {property} from '@wonderlandengine/api/decorators.js';
+import {TileElementType, TileType} from '../types/HexTile.ts';
+import {Six} from '../types/Six.ts';
 
 export class TileMaterials extends Component {
     static TypeName = 'tile-materials';
 
     @property.material()
-    fireMaterial?:Material;
+    fireMaterial?: Material;
 
     @property.material()
-    waterMaterial?:Material;
+    waterMaterial?: Material;
 
     @property.material()
     earthMaterial?: Material;
@@ -30,11 +31,11 @@ export class TileMaterials extends Component {
             this.object.findByNameRecursive('Slice3')[0],
             this.object.findByNameRecursive('Slice4')[0],
             this.object.findByNameRecursive('Slice5')[0],
-            this.object.findByNameRecursive('Slice6')[0]
+            this.object.findByNameRecursive('Slice6')[0],
         ];
     }
 
-    public setMaterials(types: TileElementType[]) {
+    public setMaterials(types: Six<TileElementType>) {
         for (let i = 0; i < this.slices!.length; i++) {
             const slice = this.slices![i];
             const type = types[i];

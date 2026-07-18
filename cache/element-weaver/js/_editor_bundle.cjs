@@ -31974,6 +31974,7 @@
   __export(bootstrap_services_exports, {
     Services: () => Services,
     configService: () => configService,
+    elementDistributionService: () => elementDistributionService,
     gameFlowService: () => gameFlowService,
     gamePlayService: () => gamePlayService,
     registerServices: () => registerServices,
@@ -32243,9 +32244,12 @@
     getTileDataById(tileId) {
       return this.tileData.get(tileId);
     }
-    addTile(x2, y2, z, type) {
-      const newTile = new HexagonTile(x2, y2, z, type);
+    addTile(x2, y2, z, elements) {
+      const newTile = new HexagonTile(x2, y2, z, elements.type);
       this.grid.addTile(newTile);
+      if (elements && elements.type === "piece" /* piece */) {
+        this.tileData.set(newTile.id, elements);
+      }
       return newTile.id;
     }
   };
@@ -32260,6 +32264,12 @@
       this.configModel = configModel2;
     }
   };
+
+  // js/services/GamePlayService.ts
+  var GamePlayService_exports = {};
+  __export(GamePlayService_exports, {
+    GamePlayService: () => GamePlayService
+  });
 
   // js/utils/Events.ts
   var EventEmitter = class {
@@ -32335,7 +32345,8 @@
 
   // js/services/GamePlayService.ts
   var GamePlayService = class {
-    constructor(gameModel2) {
+    constructor(elementDistributionService2, gameModel2) {
+      this.elementDistributionService = elementDistributionService2;
       this.gameModel = gameModel2;
     }
     onNewGame = new EventEmitter();
@@ -32345,7 +32356,12 @@
       this.gameModel.clearGrid();
       this.onNewGame.emit();
       const changedTileIds = [];
-      const addedTileId = this.gameModel.addTile(0, 0, 0, "piece" /* piece */);
+      const addedTileId = this.gameModel.addTile(0, 0, 0, {
+        id: "0,0,0",
+        type: "piece" /* piece */,
+        elements: this.elementDistributionService.createRandomElementDistribution(false),
+        rotation: 0
+      });
       changedTileIds.push(addedTileId);
       const addedPlaceholderIds = this.surroundWithPlaceholders();
       changedTileIds.push(...addedPlaceholderIds);
@@ -32364,12 +32380,10 @@
           for (const neighbor of neighbors) {
             const neighborTile = this.gameModel.getTileAt(neighbor.x, neighbor.y, neighbor.z);
             if (!neighborTile) {
-              const addedTileId = this.gameModel.addTile(
-                neighbor.x,
-                neighbor.y,
-                neighbor.z,
-                "placeholder" /* placeholder */
-              );
+              const addedTileId = this.gameModel.addTile(neighbor.x, neighbor.y, neighbor.z, {
+                id: `${neighbor.x},${neighbor.y},${neighbor.z}`,
+                type: "placeholder" /* placeholder */
+              });
               addedTileIds.push(addedTileId);
             }
           }
@@ -32383,12 +32397,21 @@
     placeTile(tile) {
       const existingTile = this.gameModel.getTileById(tile.id);
       if (existingTile && existingTile.type === "placeholder" /* placeholder */) {
-        this.gameModel.addTile(tile.x, tile.y, tile.z, "piece" /* piece */);
+        const elements = this.elementDistributionService.createRandomElementDistribution();
+        this.gameModel.addTile(tile.x, tile.y, tile.z, {
+          id: `${tile.x},${tile.y},${tile.z}`,
+          type: "piece" /* piece */,
+          elements,
+          rotation: 0
+        });
         const changedTileIds = [tile.id];
         const addedPlaceholderIds = this.surroundWithPlaceholders();
         changedTileIds.push(...addedPlaceholderIds);
         this.onTilesChanged.emit(changedTileIds);
       }
+    }
+    getTileDataById(tileId) {
+      return this.gameModel.getTileDataById(tileId);
     }
   };
 
@@ -32868,6 +32891,38 @@
     };
   };
 
+  // js/services/ElementDistributionService.ts
+  var ElementDistributionService_exports = {};
+  __export(ElementDistributionService_exports, {
+    ElementDistributionService: () => ElementDistributionService
+  });
+  var ElementDistributionService = class {
+    createRandomElementDistribution(addSpirit = true) {
+      const elements = [];
+      const availableElements = [
+        "fire" /* fire */,
+        "fire" /* fire */,
+        "water" /* water */,
+        "water" /* water */,
+        "earth" /* earth */,
+        "earth" /* earth */,
+        "air" /* air */,
+        "air" /* air */
+      ];
+      if (addSpirit) {
+        availableElements.push("spirit" /* spirit */);
+      }
+      while (elements.length < 6) {
+        let element = rng.getItem(availableElements);
+        if (element === "spirit" /* spirit */) {
+          availableElements.splice(availableElements.indexOf("spirit" /* spirit */), 1);
+        }
+        elements.push(element);
+      }
+      return elements;
+    }
+  };
+
   // js/bootstrap-services.ts
   var Services = {
     configService: Symbol("ConfigService"),
@@ -32875,13 +32930,15 @@
     gameFlowService: Symbol("GameFlowService"),
     tileInteractionService: Symbol("TileInteractionService"),
     tilePlayService: Symbol("TilePlayService"),
+    elementDistributionService: Symbol("ElementDistributionService"),
     configModel: Symbol("ConfigModel"),
     gameModel: Symbol("GameModel")
   };
   var gameModel = new GameModel();
   var configModel = new ConfigModel();
   var configService = new ConfigService(configModel);
-  var gamePlayService = new GamePlayService(gameModel);
+  var elementDistributionService = new ElementDistributionService();
+  var gamePlayService = new GamePlayService(elementDistributionService, gameModel);
   var gameFlowService = new GameFlowService(gamePlayService);
   var tileInteractionService = new TileInteractionService(gamePlayService);
   var tilePlayService = new TilePlayService(gamePlayService, tileInteractionService);
@@ -32893,6 +32950,7 @@
     serviceLocator.registerSingleton(Services.gameFlowService, gameFlowService);
     serviceLocator.registerSingleton(Services.tileInteractionService, tileInteractionService);
     serviceLocator.registerSingleton(Services.tilePlayService, tilePlayService);
+    serviceLocator.registerSingleton(Services.elementDistributionService, elementDistributionService);
   }
 
   // js/components/hex-grid.ts
@@ -32926,6 +32984,73 @@
   __decorateClass([
     property.string()
   ], TileData.prototype, "tileId", 2);
+
+  // js/components/tile-materials.ts
+  var tile_materials_exports = {};
+  __export(tile_materials_exports, {
+    TileMaterials: () => TileMaterials
+  });
+  var TileMaterials = class extends Component3 {
+    fireMaterial;
+    waterMaterial;
+    earthMaterial;
+    airMaterial;
+    spiritMaterial;
+    slices;
+    start() {
+      this.slices = [
+        this.object.findByNameRecursive("Slice1")[0],
+        this.object.findByNameRecursive("Slice2")[0],
+        this.object.findByNameRecursive("Slice3")[0],
+        this.object.findByNameRecursive("Slice4")[0],
+        this.object.findByNameRecursive("Slice5")[0],
+        this.object.findByNameRecursive("Slice6")[0]
+      ];
+    }
+    setMaterials(types) {
+      for (let i2 = 0; i2 < this.slices.length; i2++) {
+        const slice = this.slices[i2];
+        const type = types[i2];
+        let material;
+        switch (type) {
+          case "fire" /* fire */:
+            material = this.fireMaterial;
+            break;
+          case "water" /* water */:
+            material = this.waterMaterial;
+            break;
+          case "earth" /* earth */:
+            material = this.earthMaterial;
+            break;
+          case "air" /* air */:
+            material = this.airMaterial;
+            break;
+          case "spirit" /* spirit */:
+            material = this.spiritMaterial;
+            break;
+        }
+        if (material) {
+          slice.getComponent(MeshComponent).material = material;
+        }
+      }
+    }
+  };
+  __publicField(TileMaterials, "TypeName", "tile-materials");
+  __decorateClass([
+    property.material()
+  ], TileMaterials.prototype, "fireMaterial", 2);
+  __decorateClass([
+    property.material()
+  ], TileMaterials.prototype, "waterMaterial", 2);
+  __decorateClass([
+    property.material()
+  ], TileMaterials.prototype, "earthMaterial", 2);
+  __decorateClass([
+    property.material()
+  ], TileMaterials.prototype, "airMaterial", 2);
+  __decorateClass([
+    property.material()
+  ], TileMaterials.prototype, "spiritMaterial", 2);
 
   // js/components/hex-grid.ts
   var HexGrid = class extends Component3 {
@@ -32971,6 +33096,10 @@
             newTile = this.tilePrefabs.spawn("Placeholder");
           } else {
             newTile = this.tilePrefabs.spawn("Tile");
+            const tileData = this.gamePlayService.getTileDataById(tileId);
+            if (tileData && tileData.type === "piece") {
+              newTile.getComponent(TileMaterials).setMaterials(tileData.elements);
+            }
           }
           newTile.addComponent(TileData, { tileId });
           newTile.resetPosition();
@@ -33047,73 +33176,6 @@
     };
   };
   __publicField(TileInteraction, "TypeName", "tile-interaction");
-
-  // js/components/tile-materials.ts
-  var tile_materials_exports = {};
-  __export(tile_materials_exports, {
-    TileMaterials: () => TileMaterials
-  });
-  var TileMaterials = class extends Component3 {
-    fireMaterial;
-    waterMaterial;
-    earthMaterial;
-    airMaterial;
-    spiritMaterial;
-    slices;
-    start() {
-      this.slices = [
-        this.object.findByNameRecursive("Slice1")[0],
-        this.object.findByNameRecursive("Slice2")[0],
-        this.object.findByNameRecursive("Slice3")[0],
-        this.object.findByNameRecursive("Slice4")[0],
-        this.object.findByNameRecursive("Slice5")[0],
-        this.object.findByNameRecursive("Slice6")[0]
-      ];
-    }
-    setMaterials(types) {
-      for (let i2 = 0; i2 < this.slices.length; i2++) {
-        const slice = this.slices[i2];
-        const type = types[i2];
-        let material;
-        switch (type) {
-          case "fire" /* fire */:
-            material = this.fireMaterial;
-            break;
-          case "water" /* water */:
-            material = this.waterMaterial;
-            break;
-          case "earth" /* earth */:
-            material = this.earthMaterial;
-            break;
-          case "air" /* air */:
-            material = this.airMaterial;
-            break;
-          case "spirit" /* spirit */:
-            material = this.spiritMaterial;
-            break;
-        }
-        if (material) {
-          slice.getComponent(MeshComponent).material = material;
-        }
-      }
-    }
-  };
-  __publicField(TileMaterials, "TypeName", "tile-materials");
-  __decorateClass([
-    property.material()
-  ], TileMaterials.prototype, "fireMaterial", 2);
-  __decorateClass([
-    property.material()
-  ], TileMaterials.prototype, "waterMaterial", 2);
-  __decorateClass([
-    property.material()
-  ], TileMaterials.prototype, "earthMaterial", 2);
-  __decorateClass([
-    property.material()
-  ], TileMaterials.prototype, "airMaterial", 2);
-  __decorateClass([
-    property.material()
-  ], TileMaterials.prototype, "spiritMaterial", 2);
 
   // js/ui/GameServicesProvider.tsx
   var GameServicesProvider_exports = {};
@@ -36723,6 +36785,8 @@
   _registerEditor(tile_interaction_exports);
   _registerEditor(tile_materials_exports);
   _registerEditor(tile_prefabs_exports);
+  _registerEditor(ElementDistributionService_exports);
+  _registerEditor(GamePlayService_exports);
   _registerEditor(GameServicesProvider_exports);
   _registerEditor(mainMenu_exports);
   _registerEditor(useMenuViewModel_exports);

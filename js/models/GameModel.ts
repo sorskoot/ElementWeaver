@@ -25,7 +25,7 @@ export interface IGameModel {
      * Adds a new tile to the grid at the specified cube coordinates with the given type.
      * @returns The ID of the newly added tile
      */
-    addTile(x: number, y: number, z: number, type: TileType): string;
+    addTile(x: number, y: number, z: number, elements: HexTileData): string;
 
     /**
      * Gets a tile by its unique ID, if it exists in the grid.
@@ -33,6 +33,13 @@ export interface IGameModel {
      * @returns The HexagonTile with the specified ID, or undefined if no such tile exists.
      */
     getTileById(tileId: string): HexagonTile | undefined;
+
+    /**
+     * Gets the tile data associated with a specific tile ID, if it exists.
+     * @param tileId The unique ID of the tile for which to retrieve data.
+     * @returns The HexTileData associated with the specified tile ID, or undefined if no such data exists.
+     */
+    getTileDataById(tileId: string): HexTileData | undefined;
 
     tileData: Map<string, HexTileData>;
 }
@@ -65,9 +72,13 @@ export class GameModel implements IGameModel {
     getTileDataById(tileId: string): HexTileData | undefined {
         return this.tileData.get(tileId);
     }
-    addTile(x: number, y: number, z: number, type: TileType): string {
-        const newTile = new HexagonTile(x, y, z, type);
+
+    addTile(x: number, y: number, z: number, elements: HexTileData): string {
+        const newTile = new HexagonTile(x, y, z, elements.type);
         this.grid.addTile(newTile);
+        if (elements && elements.type === TileType.piece) {
+            this.tileData.set(newTile.id, elements);
+        }
         return newTile.id;
     }
 }
