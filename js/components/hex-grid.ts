@@ -1,18 +1,23 @@
 import {Component, Object3D, WonderlandEngine} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {TilePrefabs} from './tile-prefabs.ts';
-import {wlUtils} from '@sorskoot/wonderland-components';
+import {SelfDestruct, wlUtils} from '@sorskoot/wonderland-components';
 import {serviceLocator} from '../utils/ServiceLocator.ts';
 import {Services} from '../bootstrap-services.ts';
 import {IGamePlayService} from '../services/GamePlayService.ts';
 import {TileData} from './tile-data.ts';
 import {TileMaterials} from './tile-materials.ts';
+import {quat} from 'gl-matrix';
+import {EWUtils} from '../utils/EWUtils.ts';
+
+const tempQuat = quat.create();
 
 export class HexGrid extends Component {
     static TypeName = 'hex-grid';
 
     static onRegister(engine: WonderlandEngine) {
         engine.registerComponent(TileData);
+        engine.registerComponent(SelfDestruct);
     }
 
     @property.object({required: true})
@@ -64,7 +69,9 @@ export class HexGrid extends Component {
             // So we deleted the existing tile and spawn a new one in its place.
             const existingTile = this.hexTiles.get(tileId);
             if (existingTile && !existingTile.isDestroyed) {
-                existingTile.destroy();
+                // Hide the old tile and destroy it after a short delay to allow the hover events to complete.
+                existingTile.setScalingWorld([0, 0, 0]);
+                existingTile.addComponent(SelfDestruct, {delay: 500});
                 this.hexTiles.delete(tileId);
             }
             const tile = this.gamePlayService.getTile(tileId);
@@ -77,6 +84,9 @@ export class HexGrid extends Component {
                     const tileData = this.gamePlayService.getTileDataById(tileId);
                     if (tileData && tileData.type === 'piece') {
                         newTile.getComponent(TileMaterials)!.setMaterials(tileData.elements);
+                        const rotation = EWUtils.rotationToDegrees(tileData.rotation);
+                        quat.fromEuler(tempQuat, 0, rotation, 0);
+                        newTile.setRotationLocal(tempQuat);
                     }
                     //newTile.getComponent(TileMaterials)!.setMaterials(tile.elements);
                 }

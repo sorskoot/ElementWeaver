@@ -1,4 +1,3 @@
-import {Rotation} from './Rotation.ts';
 import {Six} from './Six.ts';
 
 type HexTileBase = {
@@ -9,9 +8,7 @@ type HexTileBase = {
 export type HexTilePiece = HexTileBase & {
     type: TileType.piece;
     readonly elements: Six<TileElementType>;
-    /**
-     * rotation in steps */
-    rotation: Rotation;
+    rotation: number;
 };
 
 export type HexTilePlaceholder = HexTileBase & {

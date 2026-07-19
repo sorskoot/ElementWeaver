@@ -1630,8 +1630,8 @@
                 {
                     "type": "input-helper",
                     "input-helper": {
-                        "leftControllerObject": "130",
-                        "rightControllerObject": "129"
+                        "rightControllerObject": "129",
+                        "leftControllerObject": "130"
                     }
                 }
             ]

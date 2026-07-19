@@ -17,6 +17,12 @@ export interface IGamePlayService {
 
     getTileDataById(tileId: string): HexTileElements | undefined;
 
+    rotatePreviewTileCounterClockwise(): void;
+
+    rotatePreviewTileClockwise(): void;
+
+    getNextTile(): HexTilePiece | undefined;
+
     /**
      * Event emitted when a new game is started.
      */
@@ -63,6 +69,8 @@ export class GamePlayService implements IGamePlayService {
         changedTileIds.push(...addedPlaceholderIds);
 
         this.onTilesChanged.emit(changedTileIds);
+
+        this.createNextTilePreview();
     }
 
     createNextTilePreview(): void {
@@ -113,22 +121,41 @@ export class GamePlayService implements IGamePlayService {
     placeTile(tile: HexagonTile): void {
         const existingTile = this.gameModel.getTileById(tile.id);
         if (existingTile && existingTile.type === TileType.placeholder) {
-            const elements = this.elementDistributionService.createRandomElementDistribution();
             this.gameModel.addTile(tile.x, tile.y, tile.z, {
                 id: `${tile.x},${tile.y},${tile.z}`,
                 type: TileType.piece,
-                elements: elements,
-                rotation: 0,
+                elements: this.nextTile!.elements,
+                rotation: this.nextTile!.rotation,
             });
             const changedTileIds: string[] = [tile.id];
             // surround the newly placed tile with placeholder tiles if empty spots exist
             const addedPlaceholderIds = this.surroundWithPlaceholders();
             changedTileIds.push(...addedPlaceholderIds);
             this.onTilesChanged.emit(changedTileIds);
+
+            this.createNextTilePreview();
         }
     }
 
     getTileDataById(tileId: string): HexTileElements | undefined {
         return this.gameModel.getTileDataById(tileId);
+    }
+
+    getNextTile(): HexTilePiece | undefined {
+        return this.nextTile;
+    }
+
+    rotatePreviewTileCounterClockwise(): void {
+        if (this.nextTile && this.nextTile.type === TileType.piece) {
+            this.nextTile.rotation = (this.nextTile.rotation + 1) % 6;
+            this.onTilePreviewChanged.emit(this.nextTile);
+        }
+    }
+
+    rotatePreviewTileClockwise(): void {
+        if (this.nextTile && this.nextTile.type === TileType.piece) {
+            this.nextTile.rotation = (this.nextTile.rotation + 5) % 6;
+            this.onTilePreviewChanged.emit(this.nextTile);
+        }
     }
 }

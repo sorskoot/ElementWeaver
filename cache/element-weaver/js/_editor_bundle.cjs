@@ -32006,26 +32006,6 @@
   };
   var serviceLocator = new ServiceLocator2();
 
-  // js/types/HexTile.ts
-  var HexTile_exports = {};
-  __export(HexTile_exports, {
-    TileElementType: () => TileElementType,
-    TileType: () => TileType
-  });
-  var TileType = /* @__PURE__ */ ((TileType3) => {
-    TileType3["placeholder"] = "placeholder";
-    TileType3["piece"] = "piece";
-    return TileType3;
-  })(TileType || {});
-  var TileElementType = /* @__PURE__ */ ((TileElementType2) => {
-    TileElementType2["fire"] = "fire";
-    TileElementType2["water"] = "water";
-    TileElementType2["earth"] = "earth";
-    TileElementType2["air"] = "air";
-    TileElementType2["spirit"] = "spirit";
-    return TileElementType2;
-  })(TileElementType || {});
-
   // js/classes/Tags.ts
   var _Tags2 = class {
     _tagList = /* @__PURE__ */ new Map();
@@ -32388,6 +32368,7 @@
       const addedPlaceholderIds = this.surroundWithPlaceholders();
       changedTileIds.push(...addedPlaceholderIds);
       this.onTilesChanged.emit(changedTileIds);
+      this.createNextTilePreview();
     }
     createNextTilePreview() {
       const tileData = this.elementDistributionService.createRandomElementDistribution();
@@ -32429,21 +32410,36 @@
     placeTile(tile) {
       const existingTile = this.gameModel.getTileById(tile.id);
       if (existingTile && existingTile.type === "placeholder" /* placeholder */) {
-        const elements = this.elementDistributionService.createRandomElementDistribution();
         this.gameModel.addTile(tile.x, tile.y, tile.z, {
           id: `${tile.x},${tile.y},${tile.z}`,
           type: "piece" /* piece */,
-          elements,
-          rotation: 0
+          elements: this.nextTile.elements,
+          rotation: this.nextTile.rotation
         });
         const changedTileIds = [tile.id];
         const addedPlaceholderIds = this.surroundWithPlaceholders();
         changedTileIds.push(...addedPlaceholderIds);
         this.onTilesChanged.emit(changedTileIds);
+        this.createNextTilePreview();
       }
     }
     getTileDataById(tileId) {
       return this.gameModel.getTileDataById(tileId);
+    }
+    getNextTile() {
+      return this.nextTile;
+    }
+    rotatePreviewTileCounterClockwise() {
+      if (this.nextTile && this.nextTile.type === "piece" /* piece */) {
+        this.nextTile.rotation = (this.nextTile.rotation + 1) % 6;
+        this.onTilePreviewChanged.emit(this.nextTile);
+      }
+    }
+    rotatePreviewTileClockwise() {
+      if (this.nextTile && this.nextTile.type === "piece" /* piece */) {
+        this.nextTile.rotation = (this.nextTile.rotation + 5) % 6;
+        this.onTilePreviewChanged.emit(this.nextTile);
+      }
     }
   };
 
@@ -32924,10 +32920,6 @@
   };
 
   // js/services/ElementDistributionService.ts
-  var ElementDistributionService_exports = {};
-  __export(ElementDistributionService_exports, {
-    ElementDistributionService: () => ElementDistributionService
-  });
   var ElementDistributionService = class {
     createRandomElementDistribution(addSpirit = true) {
       const elements = [];
@@ -33084,10 +33076,20 @@
     property.material()
   ], TileMaterials.prototype, "spiritMaterial", 2);
 
+  // js/utils/EWUtils.ts
+  function rotationToDegrees(rotation) {
+    return rotation * 60;
+  }
+  var EWUtils = {
+    rotationToDegrees
+  };
+
   // js/components/hex-grid.ts
+  var tempQuat5 = quat_exports.create();
   var HexGrid = class extends Component3 {
     static onRegister(engine) {
       engine.registerComponent(TileData);
+      engine.registerComponent(SelfDestruct);
     }
     get gamePlayService() {
       return serviceLocator.get(Services.gamePlayService);
@@ -33118,7 +33120,8 @@
       for (const tileId of changedTileIds) {
         const existingTile = this.hexTiles.get(tileId);
         if (existingTile && !existingTile.isDestroyed) {
-          existingTile.destroy();
+          existingTile.setScalingWorld([0, 0, 0]);
+          existingTile.addComponent(SelfDestruct, { delay: 500 });
           this.hexTiles.delete(tileId);
         }
         const tile = this.gamePlayService.getTile(tileId);
@@ -33131,6 +33134,9 @@
             const tileData = this.gamePlayService.getTileDataById(tileId);
             if (tileData && tileData.type === "piece") {
               newTile.getComponent(TileMaterials).setMaterials(tileData.elements);
+              const rotation = EWUtils.rotationToDegrees(tileData.rotation);
+              quat_exports.fromEuler(tempQuat5, 0, rotation, 0);
+              newTile.setRotationLocal(tempQuat5);
             }
           }
           newTile.addComponent(TileData, { tileId });
@@ -33155,10 +33161,60 @@
     InputHelper: () => InputHelper
   });
   var InputHelper = class extends Component3 {
+    //TODO: Implement a way to switch between left and right controller for rotating the tile preview.
+    get gamePlayService() {
+      return serviceLocator.get(Services.gamePlayService);
+    }
     leftControllerObject;
     rightControllerObject;
+    stickDeadzoneThreshold = 0.1;
+    stickTriggerThreshold = 0.8;
+    mouseTriggerThreshold = 1;
+    rotation = vec3_exports.create();
+    canRotateFromStick = true;
     start() {
+      this.rightInput = this.rightControllerObject.getComponent(InputComponent);
     }
+    update(dt) {
+      vec3_exports.zero(this.rotation);
+      const axesRight = this.rightInput.xrInputSource?.gamepad?.axes;
+      if (axesRight && (Math.abs(axesRight[2]) > this.stickDeadzoneThreshold || Math.abs(axesRight[3]) > this.stickDeadzoneThreshold)) {
+        this.rotation[0] = axesRight[2];
+        this.rotation[2] = axesRight[3];
+      }
+      this.handleStickRotation(this.rotation[0]);
+    }
+    onActivate() {
+      this.engine.canvas.addEventListener("wheel", this.onMouseScroll);
+    }
+    onDeactivate() {
+      this.engine.canvas.removeEventListener("wheel", this.onMouseScroll);
+    }
+    handleStickRotation(rotationValue) {
+      if (Math.abs(rotationValue) <= this.stickDeadzoneThreshold) {
+        this.canRotateFromStick = true;
+        return;
+      }
+      if (!this.canRotateFromStick || Math.abs(rotationValue) < this.stickTriggerThreshold) {
+        return;
+      }
+      this.rotate(rotationValue < 0);
+      this.canRotateFromStick = false;
+    }
+    rotate(counterClockwise) {
+      if (counterClockwise) {
+        this.gamePlayService.rotatePreviewTileCounterClockwise();
+        return;
+      }
+      this.gamePlayService.rotatePreviewTileClockwise();
+    }
+    // Maybe something like this
+    onMouseScroll = (event) => {
+      if (Math.abs(event.deltaY) < this.mouseTriggerThreshold) {
+        return;
+      }
+      this.rotate(event.deltaY < 0);
+    };
   };
   __publicField(InputHelper, "TypeName", "input-helper");
   __decorateClass([
@@ -33167,6 +33223,15 @@
   __decorateClass([
     property.object({ required: true })
   ], InputHelper.prototype, "rightControllerObject", 2);
+  __decorateClass([
+    property.float(0.1)
+  ], InputHelper.prototype, "stickDeadzoneThreshold", 2);
+  __decorateClass([
+    property.float(0.8)
+  ], InputHelper.prototype, "stickTriggerThreshold", 2);
+  __decorateClass([
+    property.float(1)
+  ], InputHelper.prototype, "mouseTriggerThreshold", 2);
 
   // js/components/tile-interaction.ts
   var tile_interaction_exports = {};
@@ -33233,6 +33298,7 @@
   __export(tile_preview_exports, {
     TilePreview: () => TilePreview
   });
+  var tempQuat6 = quat_exports.create();
   var TilePreview = class extends Component3 {
     previewTileObject;
     previewMaterials;
@@ -33270,9 +33336,12 @@
     }
     onTilePreviewChanged = (tileData) => {
       if (!this.previewTileObject) {
-        return;
+        this.createPreviewTileObject();
       }
       this.previewMaterials?.setMaterials(tileData.elements);
+      const rotation = EWUtils.rotationToDegrees(tileData.rotation);
+      quat_exports.fromEuler(tempQuat6, 0, rotation, 0);
+      this.previewTileObject.setRotationLocal(tempQuat6);
     };
     onTileHover = (tileId, tilePos) => {
       if (!this.previewTileObject) {
@@ -36911,9 +36980,7 @@
   _registerEditor(tile_materials_exports);
   _registerEditor(tile_prefabs_exports);
   _registerEditor(tile_preview_exports);
-  _registerEditor(ElementDistributionService_exports);
   _registerEditor(GamePlayService_exports);
-  _registerEditor(HexTile_exports);
   _registerEditor(GameServicesProvider_exports);
   _registerEditor(mainMenu_exports);
   _registerEditor(useMenuViewModel_exports);

@@ -1,10 +1,7 @@
-import type { Rotation } from "../types/Rotation.ts";
-
-function rotationToDegrees(rotation: Rotation): number {
+function rotationToDegrees(rotation: number): number {
     return rotation * 60;
 }
 
-
 export const EWUtils = {
     rotationToDegrees,
-}
+};

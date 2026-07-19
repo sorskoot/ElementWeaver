@@ -7,7 +7,11 @@ import {HexTileElements, HexTilePiece} from '../types/HexTile.ts';
 import {TilePrefabs} from './tile-prefabs.ts';
 import {TileMaterials} from './tile-materials.ts';
 import {ITileInteractionService} from '../services/TileInteractionService.ts';
-import {vec3} from 'gl-matrix';
+import {quat, vec3} from 'gl-matrix';
+import {EWUtils} from '../utils/EWUtils.ts';
+import {Mathf} from '@sorskoot/wonderland-components';
+
+const tempQuat = quat.create();
 
 export class TilePreview extends Component {
     static TypeName = 'tile-preview';
@@ -60,11 +64,12 @@ export class TilePreview extends Component {
 
     private onTilePreviewChanged = (tileData: HexTilePiece) => {
         if (!this.previewTileObject) {
-            // If the preview tile object hasn't been created yet, we can't update it.
-            return;
+            this.createPreviewTileObject();
         }
-
         this.previewMaterials?.setMaterials(tileData.elements);
+        const rotation = EWUtils.rotationToDegrees(tileData.rotation);
+        quat.fromEuler(tempQuat, 0, rotation, 0);
+        this.previewTileObject!.setRotationLocal(tempQuat);
     };
 
     private onTileHover = (tileId: string, tilePos: {x: number; y: number}) => {
