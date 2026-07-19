@@ -10,35 +10,35 @@ Element Weaver:
         ✓ Spawn initial tile without Spirit @est(30m) @done(26-07-19 08:06)
         ✓ Create PlacementService @est(1h) @done(26-07-19 08:06)
         ✓ Generate placeholder cells around occupied tiles @est(1h) @done(26-07-19 08:06)
-        ☐ Implement neighbor lookup @est(30m)
-        ☐ Implement tile rotation @est(30m)
+        ✓ Implement neighbor lookup @est(30m) @done(26-07-19 21:06)
+        ✓ Implement tile rotation @est(30m) @done(26-07-19 21:06)
         ✓ Place tile on selected placeholder @est(1h) @done(26-07-19 08:06)
         ✓ Update board after placement @est(1h) @done(26-07-19 08:06)
-        ☐ Implement direct match detection @est(1h)
-        ☐ Implement basic scoring @est(30m)
-        ☐ Show current score @est(30m)
+        ✓ Implement direct match detection @est(1h) @done(26-07-19 21:06)
+        ✓ Implement basic scoring @est(30m) @done(26-07-19 21:47)
+        ✓ Show current score @est(30m) @done(26-07-19 21:47)
         ☐ Generate and display next tile preview @est(1h)
 
     Gameplay Systems:
         ✓ Create GameState admodel @est(30m) @done(26-07-19 08:07)
-        ☐ Implement combo system @est(1h)
-        ☐ Implement multiplier system @est(1h)
+        ✓ Implement combo system @est(1h) @done(26-07-19 21:47)
+        ✓ Implement multiplier system @est(1h) @done(26-07-19 21:47)
         ☐ Make multiplier cap configurable @est(15m)
-        ☐ Implement Spirit rules @est(1h)
-        ☐ Limit generated tiles to one Spirit side @est(30m)
+        ✓ Implement Spirit rules @est(1h) @done(26-07-19 21:47)
+        ✓ Limit generated tiles to one Spirit side @est(30m) @done(26-07-19 21:47)
 
     VR And Interaction:
-        ☐ Create placeholder visual prefab @est(30m)
-        ☐ Add placeholder hover feedback @est(30m)
-        ☐ Snap held tile to hovered placeholder @est(1h)
-        ☐ Show placement preview above board @est(30m)
-        ☐ Support mouse placement @est(30m)
-        ☐ Support VR controller placement @est(30m)
+        ✓ Create placeholder visual prefab @est(30m) @done(26-07-19 21:46)
+        ✓ Add placeholder hover feedback @est(30m) @done(26-07-19 21:46)
+        ✓ Snap held tile to hovered placeholder @est(1h) @done(26-07-19 21:47)
+        ✓ Show placement preview above board @est(30m) @done(26-07-19 21:47)
+        ✓ Support mouse placement @est(30m) @done(26-07-19 21:47)
+        ✓ Support VR controller placement @est(30m) @done(26-07-19 21:47)
 
     User Interface:
-        ☐ Display score @est(30m)
+        ✓ Display score @est(30m) @done(26-07-19 21:47)
         ☐ Display combo count @est(30m)
-        ☐ Display multiplier @est(30m)
+        ✓ Display multiplier @est(30m) @done(26-07-19 21:47)
         ☐ Display next tile preview @est(30m)
 
     Polish:
@@ -54,9 +54,9 @@ Element Weaver:
         ☐ High score tracking @est(1h)
 
     Architecture:
-        ☐ Create service layer structure @est(30m)
-        ☐ Create model layer structure @est(30m)
-        ☐ Create ViewModel layer structure @est(30m)
-        ☐ Keep Wonderland components presentation-only @est(15m)
+        ✓ Create service layer structure @est(30m) @done(26-07-19 21:47)
+        ✓ Create model layer structure @est(30m) @done(26-07-19 21:47)
+        ✓ Create ViewModel layer structure @est(30m) @done(26-07-19 21:47)
+        ✓ Keep Wonderland components presentation-only @est(15m) @done(26-07-19 21:47)
 
 

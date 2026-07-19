@@ -3299,11 +3299,11 @@
               return jsxWithValidation(type, props, key, false);
             }
           }
-          var jsx4 = jsxWithValidationDynamic;
-          var jsxs = jsxWithValidationStatic;
+          var jsx5 = jsxWithValidationDynamic;
+          var jsxs3 = jsxWithValidationStatic;
           exports.Fragment = REACT_FRAGMENT_TYPE;
-          exports.jsx = jsx4;
-          exports.jsxs = jsxs;
+          exports.jsx = jsx5;
+          exports.jsxs = jsxs3;
         })();
       }
     }
@@ -31978,6 +31978,7 @@
     gameFlowService: () => gameFlowService,
     gamePlayService: () => gamePlayService,
     registerServices: () => registerServices,
+    scoreService: () => scoreService,
     tileInteractionService: () => tileInteractionService,
     tilePlayService: () => tilePlayService
   });
@@ -32357,8 +32358,9 @@
 
   // js/services/GamePlayService.ts
   var GamePlayService = class {
-    constructor(elementDistributionService2, gameModel2) {
+    constructor(elementDistributionService2, scoreService2, gameModel2) {
       this.elementDistributionService = elementDistributionService2;
+      this.scoreService = scoreService2;
       this.gameModel = gameModel2;
     }
     onNewGame = new EventEmitter();
@@ -32468,6 +32470,7 @@
         return;
       }
       const neighbors = placedTile.neighbors();
+      let spirit = false;
       const matchingNeighbors = [];
       for (let i2 = 0; i2 < 6; i2++) {
         const neighbor = neighbors[i2];
@@ -32480,11 +32483,12 @@
             if (placedElement === neighborElement) {
               matchingNeighbors.push(neighborTile);
             } else if (placedElement === "spirit" || neighborElement === "spirit") {
-              matchingNeighbors.push(neighborTile);
+              spirit = true;
             }
           }
         }
       }
+      this.scoreService.addScore(matchingNeighbors.length, spirit);
       console.log(`Matching neighbors:`, matchingNeighbors.length);
     }
   };
@@ -33005,6 +33009,39 @@
     }
   };
 
+  // js/services/ScoreService.ts
+  var ScoreService_exports = {};
+  __export(ScoreService_exports, {
+    ScoreService: () => ScoreService
+  });
+  var ScoreService = class {
+    score = y(0);
+    multiplier = y(1);
+    constructor() {
+    }
+    clearScore() {
+      this.score.value = 0;
+      this.resetMultiplier();
+    }
+    addScore(matchedTiles, spirit) {
+      if (matchedTiles == 0) {
+        if (!spirit) {
+          this.resetMultiplier();
+        }
+        return;
+      }
+      let baseScore = matchedTiles * 10;
+      this.score.value += baseScore * this.multiplier.value;
+      if (this.multiplier.value < 10) {
+        this.multiplier.value += 1;
+      }
+      console.log(`Adding score for ${matchedTiles}(${baseScore}) matched tiles. Spirit: ${spirit}`);
+    }
+    resetMultiplier() {
+      this.multiplier.value = 1;
+    }
+  };
+
   // js/bootstrap-services.ts
   var Services = {
     configService: Symbol("ConfigService"),
@@ -33013,6 +33050,7 @@
     tileInteractionService: Symbol("TileInteractionService"),
     tilePlayService: Symbol("TilePlayService"),
     elementDistributionService: Symbol("ElementDistributionService"),
+    scoreService: Symbol("ScoreService"),
     configModel: Symbol("ConfigModel"),
     gameModel: Symbol("GameModel")
   };
@@ -33020,7 +33058,8 @@
   var configModel = new ConfigModel();
   var configService = new ConfigService(configModel);
   var elementDistributionService = new ElementDistributionService();
-  var gamePlayService = new GamePlayService(elementDistributionService, gameModel);
+  var scoreService = new ScoreService();
+  var gamePlayService = new GamePlayService(elementDistributionService, scoreService, gameModel);
   var gameFlowService = new GameFlowService(gamePlayService);
   var tileInteractionService = new TileInteractionService(gamePlayService);
   var tilePlayService = new TilePlayService(gamePlayService, tileInteractionService);
@@ -33033,6 +33072,7 @@
     serviceLocator.registerSingleton(Services.tileInteractionService, tileInteractionService);
     serviceLocator.registerSingleton(Services.tilePlayService, tilePlayService);
     serviceLocator.registerSingleton(Services.elementDistributionService, elementDistributionService);
+    serviceLocator.registerSingleton(Services.scoreService, scoreService);
   }
 
   // js/components/hex-grid.ts
@@ -33433,7 +33473,8 @@
     GameServicesProvider: () => GameServicesProvider,
     useGameFlowService: () => useGameFlowService,
     useGamePlayService: () => useGamePlayService,
-    useGameServices: () => useGameServices
+    useGameServices: () => useGameServices,
+    useScoreService: () => useScoreService
   });
   var import_react = __toESM(require_react(), 1);
   var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
@@ -33454,11 +33495,14 @@
   function useGamePlayService() {
     return useGameServices().gamePlayService;
   }
+  function useScoreService() {
+    return useGameServices().scoreService;
+  }
 
-  // js/ui/components/main-menu/mainMenu.tsx
-  var mainMenu_exports = {};
-  __export(mainMenu_exports, {
-    MainMenu: () => MainMenu
+  // js/ui/components/hud/hud.tsx
+  var hud_exports = {};
+  __export(hud_exports, {
+    Hud: () => Hud
   });
 
   // node_modules/@wonderlandengine/react-ui/dist/components/Button.js
@@ -36908,8 +36952,29 @@
   ProgressBar.displayName = "ProgressBar";
 
   // js/ui/utils/colorSwatch.ts
+  var colorSwatch_exports = {};
+  __export(colorSwatch_exports, {
+    ColorName: () => ColorName,
+    colorSwatch: () => colorSwatch
+  });
+  var ColorName = /* @__PURE__ */ ((ColorName2) => {
+    ColorName2[ColorName2["Text"] = 0] = "Text";
+    ColorName2[ColorName2["TextHover"] = 1] = "TextHover";
+    ColorName2[ColorName2["PanelBackground"] = 2] = "PanelBackground";
+    ColorName2[ColorName2["MainButton"] = 3] = "MainButton";
+    ColorName2[ColorName2["MainButtonHover"] = 4] = "MainButtonHover";
+    ColorName2[ColorName2["MainButtonPressed"] = 5] = "MainButtonPressed";
+    ColorName2[ColorName2["DisabledButton"] = 6] = "DisabledButton";
+    ColorName2[ColorName2["DisabledText"] = 7] = "DisabledText";
+    ColorName2[ColorName2["ElementFire"] = 8] = "ElementFire";
+    ColorName2[ColorName2["ElementWater"] = 9] = "ElementWater";
+    ColorName2[ColorName2["ElementEarth"] = 10] = "ElementEarth";
+    ColorName2[ColorName2["ElementAir"] = 11] = "ElementAir";
+    ColorName2[ColorName2["ElementSpirit"] = 12] = "ElementSpirit";
+    return ColorName2;
+  })(ColorName || {});
   var colorSwatch = {
-    Text: "#f7e476",
+    Text: "#393457",
     TextHover: "#ffffff",
     PanelBackground: "#393457",
     MainButton: "#5bb361",
@@ -36924,15 +36989,58 @@
     ElementSpirit: "#ad02aa"
   };
 
+  // js/ui/components/hud/useHudViewModel.ts
+  var useHudViewModel_exports = {};
+  __export(useHudViewModel_exports, {
+    useHudViewModel: () => useHudViewModel
+  });
+
+  // js/ui/hooks/useSignalValue.ts
+  var import_react13 = __toESM(require_react(), 1);
+  function useSignalValue(signal) {
+    const [value, setValue] = (0, import_react13.useState)(signal.value);
+    (0, import_react13.useEffect)(() => {
+      return signal.subscribe(setValue);
+    }, [signal]);
+    return value;
+  }
+
+  // js/ui/components/hud/useHudViewModel.ts
+  function useHudViewModel() {
+    const scoreService2 = useScoreService();
+    const score = useSignalValue(scoreService2.score);
+    const multiplier = useSignalValue(scoreService2.multiplier);
+    return {
+      score,
+      multiplier
+    };
+  }
+
+  // js/ui/components/hud/hud.tsx
+  var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
+  var Hud = () => {
+    const vm = useHudViewModel();
+    return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(Column, { gap: 10, width: 1e3, height: 200, justifyContent: Justify.Center, alignItems: Align.Center, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Text, { color: colorSwatch.Text, fontSize: 24, text: `Score: ${formatNumber(vm.score)}` }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Text, { color: colorSwatch.Text, fontSize: 24, text: `Multiplier: ${formatNumber(vm.multiplier)}` })
+    ] });
+  };
+
+  // js/ui/components/main-menu/mainMenu.tsx
+  var mainMenu_exports = {};
+  __export(mainMenu_exports, {
+    MainMenu: () => MainMenu
+  });
+
   // js/ui/components/main-menu/useMenuViewModel.ts
   var useMenuViewModel_exports = {};
   __export(useMenuViewModel_exports, {
     useMenuViewModel: () => useMenuViewModel
   });
-  var import_react13 = __toESM(require_react(), 1);
+  var import_react14 = __toESM(require_react(), 1);
   function useMenuViewModel() {
     const gameFlowService2 = useGameFlowService();
-    const startGame = (0, import_react13.useCallback)(() => {
+    const startGame = (0, import_react14.useCallback)(() => {
       gameFlowService2.startGame();
     }, [gameFlowService2]);
     return {
@@ -36941,10 +37049,10 @@
   }
 
   // js/ui/components/main-menu/mainMenu.tsx
-  var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
+  var import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
   var MainMenu = () => {
     const vm = useMenuViewModel();
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Row, { gap: 10, width: 1e3, height: 200, justifyContent: Justify.Center, alignItems: Align.Center, children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Row, { gap: 10, width: 1e3, height: 200, justifyContent: Justify.Center, alignItems: Align.Center, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
       Panel,
       {
         onClick: vm.play,
@@ -36953,7 +37061,7 @@
         width: 100,
         rounding: 1,
         backgroundColor: colorSwatch.MainButton,
-        children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Text, { fontSize: 16, children: "Play" })
+        children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Text, { fontSize: 16, children: "Play" })
       }
     ) });
   };
@@ -36965,24 +37073,14 @@
   });
 
   // js/ui/utils/menu-theme-context.ts
-  var import_react14 = __toESM(require_react(), 1);
   var import_react15 = __toESM(require_react(), 1);
-  var MenuThemeContext = (0, import_react15.createContext)(
+  var import_react16 = __toESM(require_react(), 1);
+  var MenuThemeContext = (0, import_react16.createContext)(
     null
   );
 
-  // js/ui/hooks/useSignalValue.ts
-  var import_react16 = __toESM(require_react(), 1);
-  function useSignalValue(signal) {
-    const [value, setValue] = (0, import_react16.useState)(signal.value);
-    (0, import_react16.useEffect)(() => {
-      return signal.subscribe(setValue);
-    }, [signal]);
-    return value;
-  }
-
   // js/ui/root-ui.tsx
-  var import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
+  var import_jsx_runtime9 = __toESM(require_jsx_runtime(), 1);
   var App = (props) => {
     const gameFlowService2 = useGameFlowService();
     const gameState = useSignalValue(gameFlowService2.gameState);
@@ -37003,21 +37101,25 @@
       }
     };
     const comp = props.comp;
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(MaterialContext.Provider, { value: comp, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(MenuThemeContext.Provider, { value: DefaultTheme, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Container, { width: 1e3, height: 200, justifyContent: Justify.Center, alignItems: Align.Center, children: gameState === "menu" /* Menu */ && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(MainMenu, {}) }) }) });
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(MaterialContext.Provider, { value: comp, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(MenuThemeContext.Provider, { value: DefaultTheme, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(Container, { width: 1e3, height: 200, justifyContent: Justify.Center, alignItems: Align.Center, children: [
+      gameState === "menu" /* Menu */ && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(MainMenu, {}),
+      gameState === "playing" /* Playing */ && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Hud, {})
+    ] }) }) });
   };
   var RootUI = class extends ReactUiBase {
     update(dt) {
       super.update();
     }
     render() {
-      return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
         GameServicesProvider,
         {
           services: {
             gameFlowService,
-            gamePlayService
+            gamePlayService,
+            scoreService
           },
-          children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(App, { comp: this })
+          children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(App, { comp: this })
         }
       );
     }
@@ -37040,10 +37142,14 @@
   _registerEditor(tile_preview_exports);
   _registerEditor(ElementDistributionService_exports);
   _registerEditor(GamePlayService_exports);
+  _registerEditor(ScoreService_exports);
   _registerEditor(GameServicesProvider_exports);
+  _registerEditor(hud_exports);
+  _registerEditor(useHudViewModel_exports);
   _registerEditor(mainMenu_exports);
   _registerEditor(useMenuViewModel_exports);
   _registerEditor(root_ui_exports);
+  _registerEditor(colorSwatch_exports);
 })();
 /*! Bundled license information:
 

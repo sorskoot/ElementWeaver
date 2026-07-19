@@ -1,10 +1,12 @@
 import React, {createContext, useContext} from 'react';
 import {IGameFlowService} from '../services/GameFlowService.ts';
 import {IGamePlayService} from '../services/GamePlayService.ts';
+import {IScoreService} from '../services/ScoreService.ts';
 
 export interface GameServices {
     gameFlowService: IGameFlowService;
     gamePlayService: IGamePlayService;
+    scoreService: IScoreService;
 }
 
 const GameServicesContext = createContext<GameServices | null>(null);
@@ -35,4 +37,8 @@ export function useGameFlowService() {
 
 export function useGamePlayService() {
     return useGameServices().gamePlayService;
+}
+
+export function useScoreService() {
+    return useGameServices().scoreService;
 }

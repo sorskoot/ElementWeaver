@@ -38,7 +38,7 @@ export enum ColorName {
 }
 
 export const colorSwatch: MenuColors = {
-    Text: '#f7e476',
+    Text: '#393457',
     TextHover: '#ffffff',
     PanelBackground: '#393457',
     MainButton: '#5bb361',

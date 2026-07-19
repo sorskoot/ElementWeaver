@@ -22,8 +22,10 @@
                 {
                     "type": "wasd-controls",
                     "wasd-controls": {
-                        "headObject": "17"
-                    }
+                        "headObject": "17",
+                        "lockY": true
+                    },
+                    "active": true
                 }
             ]
         },
@@ -33,9 +35,6 @@
             "components": [
                 {
                     "type": "view"
-                },
-                {
-                    "type": "mouse-look"
                 },
                 {
                     "type": "cursor",
@@ -56,20 +55,20 @@
                 }
             ],
             "translation": [
-                0.0,
-                0.0,
-                0.0
+                -0.0,
+                2.7942331826125155e-7,
+                2.0365335728911305e-7
             ],
             "rotation": [
+                -0.3826834,
                 0.0,
-                0.0,
-                0.0,
-                1.0
+                -2.986946867622464e-8,
+                0.9238795
             ],
             "scaling": [
                 1.0,
-                1.0,
-                1.0
+                0.9999997,
+                0.9999997
             ]
         },
         "18": {
@@ -1524,6 +1523,11 @@
                 0.15,
                 0.15,
                 0.15
+            ],
+            "translation": [
+                0.0,
+                0.5,
+                0.0
             ]
         },
         "208": {
@@ -1542,7 +1546,8 @@
                     "mesh": {
                         "mesh": "7",
                         "material": "20"
-                    }
+                    },
+                    "active": false
                 }
             ],
             "translation": [
@@ -1569,12 +1574,30 @@
                     "type": "mesh",
                     "mesh": {
                         "material": "207"
-                    }
+                    },
+                    "active": true
                 }
             ]
         },
         "235": {
-            "name": "UI"
+            "name": "UI",
+            "parent": null,
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
         },
         "236": {
             "name": "Main Menu",
@@ -1591,8 +1614,8 @@
             ],
             "translation": [
                 -0.5,
-                2.0589609,
-                0.0
+                1.5,
+                0.5
             ],
             "rotation": [
                 0.0,
@@ -1650,6 +1673,11 @@
                 0.15,
                 0.15,
                 0.15
+            ],
+            "translation": [
+                0.0,
+                0.5,
+                0.0
             ]
         },
         "127": {
@@ -2258,6 +2286,18 @@
         "216": {
             "name": "Placeholder",
             "pipeline": "252"
+        },
+        "217": {
+            "name": "Sky",
+            "pipeline": "229",
+            "Sky": {
+                "colorStop1": [
+                    0.1921568,
+                    0.1921568,
+                    0.1921568,
+                    1.0
+                ]
+            }
         }
     },
     "shaders": {
@@ -2398,6 +2438,10 @@
             "environment": {
                 "bakingMode": "sky",
                 "material": null
+            },
+            "sky": {
+                "enabled": true,
+                "material": "217"
             }
         },
         "xr": {
@@ -2583,6 +2627,10 @@
             "link": {
                 "name": "Sky",
                 "file": "default"
+            },
+            "features": {
+                "TEXTURED": false,
+                "GRADIENT": true
             }
         },
         "231": {

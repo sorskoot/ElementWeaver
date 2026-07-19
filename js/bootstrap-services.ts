@@ -7,6 +7,7 @@ import {GameFlowService} from './services/GameFlowService.ts';
 import {TileInteractionService} from './services/TileInteractionService.ts';
 import {TilePlayService} from './services/TilePlayService.ts';
 import {ElementDistributionService} from './services/ElementDistributionService.ts';
+import {ScoreService} from './services/ScoreService.ts';
 
 export const Services = {
     configService: Symbol('ConfigService'),
@@ -15,6 +16,8 @@ export const Services = {
     tileInteractionService: Symbol('TileInteractionService'),
     tilePlayService: Symbol('TilePlayService'),
     elementDistributionService: Symbol('ElementDistributionService'),
+    scoreService: Symbol('ScoreService'),
+
     configModel: Symbol('ConfigModel'),
     gameModel: Symbol('GameModel'),
 };
@@ -23,7 +26,8 @@ const gameModel = new GameModel();
 const configModel = new ConfigModel();
 const configService = new ConfigService(configModel);
 const elementDistributionService = new ElementDistributionService();
-const gamePlayService = new GamePlayService(elementDistributionService, gameModel);
+const scoreService = new ScoreService();
+const gamePlayService = new GamePlayService(elementDistributionService, scoreService, gameModel);
 const gameFlowService = new GameFlowService(gamePlayService);
 const tileInteractionService = new TileInteractionService(gamePlayService);
 
@@ -38,6 +42,7 @@ export function registerServices(): void {
     serviceLocator.registerSingleton(Services.tileInteractionService, tileInteractionService);
     serviceLocator.registerSingleton(Services.tilePlayService, tilePlayService);
     serviceLocator.registerSingleton(Services.elementDistributionService, elementDistributionService);
+    serviceLocator.registerSingleton(Services.scoreService, scoreService);
 }
 
 export {
@@ -47,4 +52,5 @@ export {
     tileInteractionService,
     tilePlayService,
     elementDistributionService,
+    scoreService,
 };

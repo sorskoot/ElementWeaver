@@ -3,6 +3,7 @@ import {IGameModel} from '../models/GameModel.ts';
 import {HexTileElements, HexTilePiece, TileType} from '../types/HexTile.ts';
 import {EventEmitter} from '../utils/Events.ts';
 import {IElementDistributionService} from './ElementDistributionService.ts';
+import {IScoreService} from './ScoreService.ts';
 
 export interface IGamePlayService {
     /**
@@ -46,6 +47,7 @@ export class GamePlayService implements IGamePlayService {
 
     constructor(
         private elementDistributionService: IElementDistributionService,
+        private scoreService: IScoreService,
         private gameModel: IGameModel
     ) {}
 
@@ -176,7 +178,7 @@ export class GamePlayService implements IGamePlayService {
         }
 
         const neighbors = placedTile.neighbors();
-
+        let spirit = false;
         const matchingNeighbors: HexagonTile[] = [];
         for (let i = 0; i < 6; i++) {
             const neighbor = neighbors[i];
@@ -189,12 +191,14 @@ export class GamePlayService implements IGamePlayService {
                     if (placedElement === neighborElement) {
                         matchingNeighbors.push(neighborTile);
                     } else if (placedElement === 'spirit' || neighborElement === 'spirit') {
-                        // TK: Track special case.
-                        matchingNeighbors.push(neighborTile);
+                        // TODO: Track special case.
+                        spirit = true;
+                        // matchingNeighbors.push(neighborTile);
                     }
                 }
             }
         }
+        this.scoreService.addScore(matchingNeighbors.length, spirit);
         console.log(`Matching neighbors:`, matchingNeighbors.length);
     }
 }

@@ -1,11 +1,11 @@
 import {Align, Justify, ReactUiBase} from '@wonderlandengine/react-ui';
-import React from 'react';
-import {Container, MaterialContext, Text} from '@wonderlandengine/react-ui/components';
+import {Container, MaterialContext} from '@wonderlandengine/react-ui/components';
+import {Hud} from './components/hud/hud.tsx';
 import {MenuThemeContext, MenuThemeContextValue} from './utils/menu-theme-context.js';
 import {colorSwatch} from './utils/colorSwatch.ts';
 import {useSignalValue} from './hooks/useSignalValue.ts';
 import {GameServicesProvider, useGameFlowService} from './GameServicesProvider.tsx';
-import {gameFlowService, gamePlayService} from '../bootstrap-services.ts';
+import {gameFlowService, gamePlayService, scoreService} from '../bootstrap-services.ts';
 import {MainMenu} from './components/main-menu/mainMenu.tsx';
 import {GameState} from '../services/GameFlowService.ts';
 
@@ -38,6 +38,7 @@ const App = (props: {comp: RootUI}) => {
             <MenuThemeContext.Provider value={DefaultTheme}>
                 <Container width={1000} height={200} justifyContent={Justify.Center} alignItems={Align.Center}>
                     {gameState === GameState.Menu && <MainMenu />}
+                    {gameState === GameState.Playing && <Hud />}
                     {/* {gameState === GameState.Playing && <Ingame />} */}
                 </Container>
             </MenuThemeContext.Provider>
@@ -59,6 +60,7 @@ export class RootUI extends ReactUiBase {
                 services={{
                     gameFlowService,
                     gamePlayService,
+                    scoreService,
                 }}
             >
                 <App comp={this} />
