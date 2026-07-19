@@ -1,5 +1,4 @@
-
-import { TileType} from '../types/HexTile.ts';
+import {TileType} from '../types/HexTile.ts';
 
 import {Tags} from './Tags.ts';
 
@@ -34,12 +33,19 @@ export class HexagonTile {
      */
     public neighbors(): {x: number; y: number; z: number}[] {
         const directions: [number, number, number][] = [
-            [1, -1, 0],
             [1, 0, -1],
-            [0, 1, -1],
-            [-1, 1, 0],
-            [-1, 0, 1],
+            [1, -1, 0],
             [0, -1, 1],
+            [-1, 0, 1],
+            [-1, 1, 0],
+            [0, 1, -1],
+
+            // [1, -1, 0],
+            // [1, 0, -1],
+            // [0, 1, -1],
+            // [-1, 1, 0],
+            // [-1, 0, 1],
+            // [0, -1, 1],
         ];
         return directions.map((a) => {
             return {

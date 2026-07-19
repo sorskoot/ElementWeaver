@@ -6,6 +6,8 @@ import * as __wonderlandengine_spatial_audio from '@wonderlandengine/spatial-aud
 _registerEditor(__wonderlandengine_spatial_audio);
 import * as _C__dev_ManiFestJVRam2_2026_2_js_bootstrap_services_ts from 'C:/dev/ManiFestJVRam2-2026_2/js/bootstrap-services.ts';
 _registerEditor(_C__dev_ManiFestJVRam2_2026_2_js_bootstrap_services_ts);
+import * as _C__dev_ManiFestJVRam2_2026_2_js_classes_HexagonTile_ts from 'C:/dev/ManiFestJVRam2-2026_2/js/classes/HexagonTile.ts';
+_registerEditor(_C__dev_ManiFestJVRam2_2026_2_js_classes_HexagonTile_ts);
 import * as _C__dev_ManiFestJVRam2_2026_2_js_components_hex_grid_ts from 'C:/dev/ManiFestJVRam2-2026_2/js/components/hex-grid.ts';
 _registerEditor(_C__dev_ManiFestJVRam2_2026_2_js_components_hex_grid_ts);
 import * as _C__dev_ManiFestJVRam2_2026_2_js_components_input_helper_ts from 'C:/dev/ManiFestJVRam2-2026_2/js/components/input-helper.ts';
@@ -20,6 +22,8 @@ import * as _C__dev_ManiFestJVRam2_2026_2_js_components_tile_prefabs_ts from 'C:
 _registerEditor(_C__dev_ManiFestJVRam2_2026_2_js_components_tile_prefabs_ts);
 import * as _C__dev_ManiFestJVRam2_2026_2_js_components_tile_preview_ts from 'C:/dev/ManiFestJVRam2-2026_2/js/components/tile-preview.ts';
 _registerEditor(_C__dev_ManiFestJVRam2_2026_2_js_components_tile_preview_ts);
+import * as _C__dev_ManiFestJVRam2_2026_2_js_services_ElementDistributionService_ts from 'C:/dev/ManiFestJVRam2-2026_2/js/services/ElementDistributionService.ts';
+_registerEditor(_C__dev_ManiFestJVRam2_2026_2_js_services_ElementDistributionService_ts);
 import * as _C__dev_ManiFestJVRam2_2026_2_js_services_GamePlayService_ts from 'C:/dev/ManiFestJVRam2-2026_2/js/services/GamePlayService.ts';
 _registerEditor(_C__dev_ManiFestJVRam2_2026_2_js_services_GamePlayService_ts);
 import * as _C__dev_ManiFestJVRam2_2026_2_js_ui_GameServicesProvider_tsx from 'C:/dev/ManiFestJVRam2-2026_2/js/ui/GameServicesProvider.tsx';

@@ -14,6 +14,13 @@ export interface IElementDistributionService {
      * @param addSpirit Optional boolean to determine if the spirit element can be included in the distribution. Defaults to true.
      */
     createRandomElementDistribution(addSpirit?: boolean): Six<TileElementType>;
+
+    /**
+     * Shifts the elements of a hexagonal tile based on the specified rotation.
+     * @param elements The current distribution of tile elements.
+     * @param rotation The number of positions to shift the elements clockwise.
+     */
+    rotateElements(elements: Six<TileElementType>, rotation: number): Six<TileElementType>;
 }
 
 export class ElementDistributionService implements IElementDistributionService {
@@ -44,5 +51,14 @@ export class ElementDistributionService implements IElementDistributionService {
             elements.push(element);
         }
         return elements as Six<TileElementType>;
+    }
+
+    rotateElements(elements: Six<TileElementType>, rotation: number): Six<TileElementType> {
+        const rotatedElements: TileElementType[] = [];
+        for (let i = 0; i < 6; i++) {
+            const rotatedIndex = (i + rotation) % 6;
+            rotatedElements[i] = elements[rotatedIndex];
+        }
+        return rotatedElements as Six<TileElementType>;
     }
 }

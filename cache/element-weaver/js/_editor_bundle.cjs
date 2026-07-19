@@ -32006,6 +32006,12 @@
   };
   var serviceLocator = new ServiceLocator2();
 
+  // js/classes/HexagonTile.ts
+  var HexagonTile_exports = {};
+  __export(HexagonTile_exports, {
+    HexagonTile: () => HexagonTile
+  });
+
   // js/classes/Tags.ts
   var _Tags2 = class {
     _tagList = /* @__PURE__ */ new Map();
@@ -32088,12 +32094,18 @@
      */
     neighbors() {
       const directions = [
-        [1, -1, 0],
         [1, 0, -1],
-        [0, 1, -1],
-        [-1, 1, 0],
+        [1, -1, 0],
+        [0, -1, 1],
         [-1, 0, 1],
-        [0, -1, 1]
+        [-1, 1, 0],
+        [0, 1, -1]
+        // [1, -1, 0],
+        // [1, 0, -1],
+        // [0, 1, -1],
+        // [-1, 1, 0],
+        // [-1, 0, 1],
+        // [0, -1, 1],
       ];
       return directions.map((a2) => {
         return {
@@ -32410,12 +32422,17 @@
     placeTile(tile) {
       const existingTile = this.gameModel.getTileById(tile.id);
       if (existingTile && existingTile.type === "placeholder" /* placeholder */) {
+        const rotatedElements = this.elementDistributionService.rotateElements(
+          this.nextTile.elements,
+          this.nextTile.rotation
+        );
         this.gameModel.addTile(tile.x, tile.y, tile.z, {
           id: `${tile.x},${tile.y},${tile.z}`,
           type: "piece" /* piece */,
-          elements: this.nextTile.elements,
-          rotation: this.nextTile.rotation
+          elements: rotatedElements,
+          rotation: 0
         });
+        this.checkMatches(tile.id);
         const changedTileIds = [tile.id];
         const addedPlaceholderIds = this.surroundWithPlaceholders();
         changedTileIds.push(...addedPlaceholderIds);
@@ -32431,15 +32448,44 @@
     }
     rotatePreviewTileCounterClockwise() {
       if (this.nextTile && this.nextTile.type === "piece" /* piece */) {
-        this.nextTile.rotation = (this.nextTile.rotation + 1) % 6;
+        this.nextTile.rotation = (this.nextTile.rotation + 5) % 6;
         this.onTilePreviewChanged.emit(this.nextTile);
       }
     }
     rotatePreviewTileClockwise() {
       if (this.nextTile && this.nextTile.type === "piece" /* piece */) {
-        this.nextTile.rotation = (this.nextTile.rotation + 5) % 6;
+        this.nextTile.rotation = (this.nextTile.rotation + 1) % 6;
         this.onTilePreviewChanged.emit(this.nextTile);
       }
+    }
+    checkMatches(tileId) {
+      const placedTile = this.gameModel.getTileById(tileId);
+      if (!placedTile || placedTile.type !== "piece" /* piece */) {
+        return;
+      }
+      const placedTileData = this.gameModel.getTileDataById(placedTile.id);
+      if (!placedTileData || placedTileData.type !== "piece" /* piece */) {
+        return;
+      }
+      const neighbors = placedTile.neighbors();
+      const matchingNeighbors = [];
+      for (let i2 = 0; i2 < 6; i2++) {
+        const neighbor = neighbors[i2];
+        const neighborTile = this.gameModel.getTileAt(neighbor.x, neighbor.y, neighbor.z);
+        if (neighborTile && neighborTile.type === "piece" /* piece */) {
+          const neighborTileData = this.gameModel.getTileDataById(neighborTile.id);
+          if (neighborTileData && placedTileData && neighborTileData.type === "piece" /* piece */) {
+            const placedElement = placedTileData.elements[i2];
+            const neighborElement = neighborTileData.elements[(i2 + 3) % 6];
+            if (placedElement === neighborElement) {
+              matchingNeighbors.push(neighborTile);
+            } else if (placedElement === "spirit" || neighborElement === "spirit") {
+              matchingNeighbors.push(neighborTile);
+            }
+          }
+        }
+      }
+      console.log(`Matching neighbors:`, matchingNeighbors.length);
     }
   };
 
@@ -32920,6 +32966,10 @@
   };
 
   // js/services/ElementDistributionService.ts
+  var ElementDistributionService_exports = {};
+  __export(ElementDistributionService_exports, {
+    ElementDistributionService: () => ElementDistributionService
+  });
   var ElementDistributionService = class {
     createRandomElementDistribution(addSpirit = true) {
       const elements = [];
@@ -32944,6 +32994,14 @@
         elements.push(element);
       }
       return elements;
+    }
+    rotateElements(elements, rotation) {
+      const rotatedElements = [];
+      for (let i2 = 0; i2 < 6; i2++) {
+        const rotatedIndex = (i2 + rotation) % 6;
+        rotatedElements[i2] = elements[rotatedIndex];
+      }
+      return rotatedElements;
     }
   };
 
@@ -33076,14 +33134,6 @@
     property.material()
   ], TileMaterials.prototype, "spiritMaterial", 2);
 
-  // js/utils/EWUtils.ts
-  function rotationToDegrees(rotation) {
-    return rotation * 60;
-  }
-  var EWUtils = {
-    rotationToDegrees
-  };
-
   // js/components/hex-grid.ts
   var tempQuat5 = quat_exports.create();
   var HexGrid = class extends Component3 {
@@ -33134,9 +33184,6 @@
             const tileData = this.gamePlayService.getTileDataById(tileId);
             if (tileData && tileData.type === "piece") {
               newTile.getComponent(TileMaterials).setMaterials(tileData.elements);
-              const rotation = EWUtils.rotationToDegrees(tileData.rotation);
-              quat_exports.fromEuler(tempQuat5, 0, rotation, 0);
-              newTile.setRotationLocal(tempQuat5);
             }
           }
           newTile.addComponent(TileData, { tileId });
@@ -33298,6 +33345,16 @@
   __export(tile_preview_exports, {
     TilePreview: () => TilePreview
   });
+
+  // js/utils/EWUtils.ts
+  function rotationToDegrees(rotation) {
+    return rotation * 60;
+  }
+  var EWUtils = {
+    rotationToDegrees
+  };
+
+  // js/components/tile-preview.ts
   var tempQuat6 = quat_exports.create();
   var TilePreview = class extends Component3 {
     previewTileObject;
@@ -36973,6 +37030,7 @@
   _registerEditor(dist_exports3);
   _registerEditor(dist_exports2);
   _registerEditor(bootstrap_services_exports);
+  _registerEditor(HexagonTile_exports);
   _registerEditor(hex_grid_exports);
   _registerEditor(input_helper_exports);
   _registerEditor(tile_data_exports);
@@ -36980,6 +37038,7 @@
   _registerEditor(tile_materials_exports);
   _registerEditor(tile_prefabs_exports);
   _registerEditor(tile_preview_exports);
+  _registerEditor(ElementDistributionService_exports);
   _registerEditor(GamePlayService_exports);
   _registerEditor(GameServicesProvider_exports);
   _registerEditor(mainMenu_exports);

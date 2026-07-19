@@ -121,12 +121,17 @@ export class GamePlayService implements IGamePlayService {
     placeTile(tile: HexagonTile): void {
         const existingTile = this.gameModel.getTileById(tile.id);
         if (existingTile && existingTile.type === TileType.placeholder) {
+            const rotatedElements = this.elementDistributionService.rotateElements(
+                this.nextTile!.elements,
+                this.nextTile!.rotation
+            );
             this.gameModel.addTile(tile.x, tile.y, tile.z, {
                 id: `${tile.x},${tile.y},${tile.z}`,
                 type: TileType.piece,
-                elements: this.nextTile!.elements,
-                rotation: this.nextTile!.rotation,
+                elements: rotatedElements,
+                rotation: 0,
             });
+            this.checkMatches(tile.id);
             const changedTileIds: string[] = [tile.id];
             // surround the newly placed tile with placeholder tiles if empty spots exist
             const addedPlaceholderIds = this.surroundWithPlaceholders();
@@ -147,15 +152,49 @@ export class GamePlayService implements IGamePlayService {
 
     rotatePreviewTileCounterClockwise(): void {
         if (this.nextTile && this.nextTile.type === TileType.piece) {
-            this.nextTile.rotation = (this.nextTile.rotation + 1) % 6;
+            this.nextTile.rotation = (this.nextTile.rotation + 5) % 6;
             this.onTilePreviewChanged.emit(this.nextTile);
         }
     }
 
     rotatePreviewTileClockwise(): void {
         if (this.nextTile && this.nextTile.type === TileType.piece) {
-            this.nextTile.rotation = (this.nextTile.rotation + 5) % 6;
+            this.nextTile.rotation = (this.nextTile.rotation + 1) % 6;
             this.onTilePreviewChanged.emit(this.nextTile);
         }
+    }
+
+    private checkMatches(tileId: string): void {
+        const placedTile = this.gameModel.getTileById(tileId);
+        if (!placedTile || placedTile.type !== TileType.piece) {
+            return;
+        }
+
+        const placedTileData = this.gameModel.getTileDataById(placedTile.id);
+        if (!placedTileData || placedTileData.type !== TileType.piece) {
+            return;
+        }
+
+        const neighbors = placedTile.neighbors();
+
+        const matchingNeighbors: HexagonTile[] = [];
+        for (let i = 0; i < 6; i++) {
+            const neighbor = neighbors[i];
+            const neighborTile = this.gameModel.getTileAt(neighbor.x, neighbor.y, neighbor.z);
+            if (neighborTile && neighborTile.type === TileType.piece) {
+                const neighborTileData = this.gameModel.getTileDataById(neighborTile.id);
+                if (neighborTileData && placedTileData && neighborTileData.type === TileType.piece) {
+                    const placedElement = placedTileData.elements[i];
+                    const neighborElement = neighborTileData.elements[(i + 3) % 6];
+                    if (placedElement === neighborElement) {
+                        matchingNeighbors.push(neighborTile);
+                    } else if (placedElement === 'spirit' || neighborElement === 'spirit') {
+                        // TK: Track special case.
+                        matchingNeighbors.push(neighborTile);
+                    }
+                }
+            }
+        }
+        console.log(`Matching neighbors:`, matchingNeighbors.length);
     }
 }

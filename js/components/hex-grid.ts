@@ -84,11 +84,7 @@ export class HexGrid extends Component {
                     const tileData = this.gamePlayService.getTileDataById(tileId);
                     if (tileData && tileData.type === 'piece') {
                         newTile.getComponent(TileMaterials)!.setMaterials(tileData.elements);
-                        const rotation = EWUtils.rotationToDegrees(tileData.rotation);
-                        quat.fromEuler(tempQuat, 0, rotation, 0);
-                        newTile.setRotationLocal(tempQuat);
                     }
-                    //newTile.getComponent(TileMaterials)!.setMaterials(tile.elements);
                 }
                 newTile.addComponent(TileData, {tileId: tileId});
                 newTile.resetPosition();
