@@ -60,7 +60,7 @@
                 2.0365335728911305e-7
             ],
             "rotation": [
-                -0.3826834,
+                -0.3826833,
                 0.0,
                 -2.986946867622464e-8,
                 0.9238795
@@ -1737,6 +1737,23 @@
                     }
                 }
             ]
+        },
+        "241": {
+            "name": "Mesh.001",
+            "translation": [
+                0.0,
+                -10000.0,
+                0.0
+            ],
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "208",
+                        "mesh": "9"
+                    }
+                }
+            ]
         }
     },
     "meshes": {
@@ -2243,7 +2260,8 @@
             "link": {
                 "name": "Fire",
                 "file": "assets\\models\\tile.fbx"
-            }
+            },
+            "pipeline": "223"
         },
         "209": {
             "link": {
@@ -2614,7 +2632,9 @@
                 "file": "default"
             },
             "features": {
-                "SEPARATE_OCCLUSION_TEXTURE": true
+                "SEPARATE_OCCLUSION_TEXTURE": true,
+                "NORMAL_MAPPING": true,
+                "WITH_EMISSIVE": true
             }
         },
         "226": {

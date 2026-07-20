@@ -11,7 +11,7 @@
             "prefab": true
         },
         "runtime": {
-            "visualizePhysX": true
+            "visualizePhysX": false
         }
     },
     "files": {
@@ -21,6 +21,54 @@
         },
         "2": {
             "fileName": "assets/models/tile_empty.fbx",
+            "importerName": ""
+        },
+        "3": {
+            "fileName": "assets/textures/fire.png",
+            "importerName": ""
+        },
+        "4": {
+            "fileName": "assets/textures/ElementWeaver_Fire_basecolor.png",
+            "importerName": ""
+        },
+        "5": {
+            "fileName": "assets/textures/ElementWeaver_Fire_normal.png",
+            "importerName": ""
+        },
+        "6": {
+            "fileName": "assets/textures/ElementWeaver_Fire_roughness.png",
+            "importerName": ""
+        },
+        "7": {
+            "fileName": "assets/textures/ElementWeaver_Water_1_basecolor.png",
+            "importerName": ""
+        },
+        "8": {
+            "fileName": "assets/textures/ElementWeaver_Water_1_normal.png",
+            "importerName": ""
+        },
+        "9": {
+            "fileName": "assets/textures/ElementWeaver_Earth_basecolor.png",
+            "importerName": ""
+        },
+        "10": {
+            "fileName": "assets/textures/ElementWeaver_Earth_normal.png",
+            "importerName": ""
+        },
+        "11": {
+            "fileName": "assets/textures/ElementWeaver_Air_basecolor.png",
+            "importerName": ""
+        },
+        "12": {
+            "fileName": "assets/textures/ElementWeaver_Air_normal.png",
+            "importerName": ""
+        },
+        "13": {
+            "fileName": "assets/textures/ElementWeaver_Spirit_basecolor.png",
+            "importerName": ""
+        },
+        "14": {
+            "fileName": "assets/textures/ElementWeaver_Spirit_normal.png",
             "importerName": ""
         }
     },
@@ -74,8 +122,154 @@
             }
         }
     },
-    "images": {},
-    "textures": {},
+    "images": {
+        "1": {
+            "link": {
+                "name": "fire.png",
+                "file": "assets\\textures\\fire.png"
+            }
+        },
+        "2": {
+            "link": {
+                "name": "ElementWeaver_Fire_basecolor.png",
+                "file": "assets\\textures\\ElementWeaver_Fire_basecolor.png"
+            }
+        },
+        "3": {
+            "link": {
+                "name": "ElementWeaver_Fire_normal.png",
+                "file": "assets\\textures\\ElementWeaver_Fire_normal.png"
+            }
+        },
+        "4": {
+            "link": {
+                "name": "ElementWeaver_Fire_roughness.png",
+                "file": "assets\\textures\\ElementWeaver_Fire_roughness.png"
+            }
+        },
+        "5": {
+            "link": {
+                "name": "ElementWeaver_Water_1_basecolor.png",
+                "file": "assets\\textures\\ElementWeaver_Water_1_basecolor.png"
+            }
+        },
+        "6": {
+            "link": {
+                "name": "ElementWeaver_Water_1_normal.png",
+                "file": "assets\\textures\\ElementWeaver_Water_1_normal.png"
+            }
+        },
+        "7": {
+            "link": {
+                "name": "ElementWeaver_Earth_basecolor.png",
+                "file": "assets\\textures\\ElementWeaver_Earth_basecolor.png"
+            }
+        },
+        "8": {
+            "link": {
+                "name": "ElementWeaver_Earth_normal.png",
+                "file": "assets\\textures\\ElementWeaver_Earth_normal.png"
+            }
+        },
+        "9": {
+            "link": {
+                "name": "ElementWeaver_Air_basecolor.png",
+                "file": "assets\\textures\\ElementWeaver_Air_basecolor.png"
+            }
+        },
+        "10": {
+            "link": {
+                "name": "ElementWeaver_Air_normal.png",
+                "file": "assets\\textures\\ElementWeaver_Air_normal.png"
+            }
+        },
+        "11": {
+            "link": {
+                "name": "ElementWeaver_Spirit_basecolor.png",
+                "file": "assets\\textures\\ElementWeaver_Spirit_basecolor.png"
+            }
+        },
+        "12": {
+            "link": {
+                "name": "ElementWeaver_Spirit_normal.png",
+                "file": "assets\\textures\\ElementWeaver_Spirit_normal.png"
+            }
+        }
+    },
+    "textures": {
+        "1": {
+            "link": {
+                "name": "fire.png",
+                "file": "assets\\textures\\fire.png"
+            }
+        },
+        "2": {
+            "link": {
+                "name": "ElementWeaver_Fire_basecolor.png",
+                "file": "assets\\textures\\ElementWeaver_Fire_basecolor.png"
+            }
+        },
+        "3": {
+            "link": {
+                "name": "ElementWeaver_Fire_normal.png",
+                "file": "assets\\textures\\ElementWeaver_Fire_normal.png"
+            }
+        },
+        "4": {
+            "link": {
+                "name": "ElementWeaver_Fire_roughness.png",
+                "file": "assets\\textures\\ElementWeaver_Fire_roughness.png"
+            }
+        },
+        "5": {
+            "link": {
+                "name": "ElementWeaver_Water_1_basecolor.png",
+                "file": "assets\\textures\\ElementWeaver_Water_1_basecolor.png"
+            }
+        },
+        "6": {
+            "link": {
+                "name": "ElementWeaver_Water_1_normal.png",
+                "file": "assets\\textures\\ElementWeaver_Water_1_normal.png"
+            }
+        },
+        "7": {
+            "link": {
+                "name": "ElementWeaver_Earth_basecolor.png",
+                "file": "assets\\textures\\ElementWeaver_Earth_basecolor.png"
+            }
+        },
+        "8": {
+            "link": {
+                "name": "ElementWeaver_Earth_normal.png",
+                "file": "assets\\textures\\ElementWeaver_Earth_normal.png"
+            }
+        },
+        "9": {
+            "link": {
+                "name": "ElementWeaver_Air_basecolor.png",
+                "file": "assets\\textures\\ElementWeaver_Air_basecolor.png"
+            }
+        },
+        "10": {
+            "link": {
+                "name": "ElementWeaver_Air_normal.png",
+                "file": "assets\\textures\\ElementWeaver_Air_normal.png"
+            }
+        },
+        "11": {
+            "link": {
+                "name": "ElementWeaver_Spirit_basecolor.png",
+                "file": "assets\\textures\\ElementWeaver_Spirit_basecolor.png"
+            }
+        },
+        "12": {
+            "link": {
+                "name": "ElementWeaver_Spirit_normal.png",
+                "file": "assets\\textures\\ElementWeaver_Spirit_normal.png"
+            }
+        }
+    },
     "fonts": {},
     "audioClips": {},
     "shaderChunks": {
@@ -375,6 +569,10 @@
             "link": {
                 "name": "Physical Opaque Textured",
                 "file": "default"
+            },
+            "features": {
+                "NORMAL_MAPPING": true,
+                "WITH_EMISSIVE": true
             }
         },
         "14": {
@@ -455,10 +653,26 @@
                 "name": "Fire",
                 "file": "assets\\models\\tile.fbx"
             },
-            "pipeline": "12",
+            "pipeline": "13",
             "Physical": {
                 "metallicFactor": 0.2,
-                "roughnessFactor": 0.6999999
+                "roughnessFactor": 0.5,
+                "albedoTexture": "2",
+                "albedoColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "normalTexture": "3",
+                "occlusionRoughnessMetallicTexture": null,
+                "emissiveColor": [
+                    0.5294117,
+                    0.5294117,
+                    0.5294117,
+                    1.0
+                ],
+                "emissiveTexture": "2"
             }
         },
         "3": {
@@ -466,10 +680,19 @@
                 "name": "Water",
                 "file": "assets\\models\\tile.fbx"
             },
-            "pipeline": "12",
+            "pipeline": "13",
             "Physical": {
                 "metallicFactor": 0.2,
-                "roughnessFactor": 0.6999999
+                "roughnessFactor": 0.5,
+                "emissiveColor": [
+                    0.5294117,
+                    0.5294117,
+                    0.5294117,
+                    1.0
+                ],
+                "albedoTexture": "5",
+                "emissiveTexture": "5",
+                "normalTexture": "6"
             }
         },
         "4": {
@@ -477,10 +700,19 @@
                 "name": "Earth",
                 "file": "assets\\models\\tile.fbx"
             },
-            "pipeline": "12",
+            "pipeline": "13",
             "Physical": {
                 "metallicFactor": 0.2,
-                "roughnessFactor": 0.6999999
+                "roughnessFactor": 0.5,
+                "emissiveColor": [
+                    0.5294117,
+                    0.5294117,
+                    0.5294117,
+                    1.0
+                ],
+                "albedoTexture": "7",
+                "emissiveTexture": "7",
+                "normalTexture": "8"
             }
         },
         "5": {
@@ -488,10 +720,19 @@
                 "name": "Air",
                 "file": "assets\\models\\tile.fbx"
             },
-            "pipeline": "12",
+            "pipeline": "13",
             "Physical": {
                 "metallicFactor": 0.2,
-                "roughnessFactor": 0.6999999
+                "roughnessFactor": 0.5,
+                "emissiveColor": [
+                    0.5294117,
+                    0.5294117,
+                    0.5294117,
+                    1.0
+                ],
+                "albedoTexture": "9",
+                "emissiveTexture": "9",
+                "normalTexture": "10"
             }
         },
         "6": {
@@ -520,10 +761,19 @@
                     1.0
                 ]
             },
-            "pipeline": "12",
+            "pipeline": "13",
             "Physical": {
                 "metallicFactor": 0.2,
-                "roughnessFactor": 0.6999999
+                "roughnessFactor": 0.5,
+                "emissiveColor": [
+                    0.5294117,
+                    0.5294117,
+                    0.5294117,
+                    1.0
+                ],
+                "albedoTexture": "11",
+                "emissiveTexture": "11",
+                "normalTexture": "12"
             }
         },
         "7": {

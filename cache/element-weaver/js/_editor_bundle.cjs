@@ -32007,12 +32007,6 @@
   };
   var serviceLocator = new ServiceLocator2();
 
-  // js/classes/HexagonTile.ts
-  var HexagonTile_exports = {};
-  __export(HexagonTile_exports, {
-    HexagonTile: () => HexagonTile
-  });
-
   // js/classes/Tags.ts
   var _Tags2 = class {
     _tagList = /* @__PURE__ */ new Map();
@@ -32277,12 +32271,6 @@
       this.configModel = configModel2;
     }
   };
-
-  // js/services/GamePlayService.ts
-  var GamePlayService_exports = {};
-  __export(GamePlayService_exports, {
-    GamePlayService: () => GamePlayService
-  });
 
   // js/utils/Events.ts
   var EventEmitter = class {
@@ -32970,10 +32958,6 @@
   };
 
   // js/services/ElementDistributionService.ts
-  var ElementDistributionService_exports = {};
-  __export(ElementDistributionService_exports, {
-    ElementDistributionService: () => ElementDistributionService
-  });
   var ElementDistributionService = class {
     createRandomElementDistribution(addSpirit = true) {
       const elements = [];
@@ -33010,10 +32994,6 @@
   };
 
   // js/services/ScoreService.ts
-  var ScoreService_exports = {};
-  __export(ScoreService_exports, {
-    ScoreService: () => ScoreService
-  });
   var ScoreService = class {
     score = y(0);
     multiplier = y(1);
@@ -33499,10 +33479,10 @@
     return useGameServices().scoreService;
   }
 
-  // js/ui/components/hud/hud.tsx
-  var hud_exports = {};
-  __export(hud_exports, {
-    Hud: () => Hud
+  // js/ui/components/main-menu/mainMenu.tsx
+  var mainMenu_exports = {};
+  __export(mainMenu_exports, {
+    MainMenu: () => MainMenu
   });
 
   // node_modules/@wonderlandengine/react-ui/dist/components/Button.js
@@ -36952,27 +36932,6 @@
   ProgressBar.displayName = "ProgressBar";
 
   // js/ui/utils/colorSwatch.ts
-  var colorSwatch_exports = {};
-  __export(colorSwatch_exports, {
-    ColorName: () => ColorName,
-    colorSwatch: () => colorSwatch
-  });
-  var ColorName = /* @__PURE__ */ ((ColorName2) => {
-    ColorName2[ColorName2["Text"] = 0] = "Text";
-    ColorName2[ColorName2["TextHover"] = 1] = "TextHover";
-    ColorName2[ColorName2["PanelBackground"] = 2] = "PanelBackground";
-    ColorName2[ColorName2["MainButton"] = 3] = "MainButton";
-    ColorName2[ColorName2["MainButtonHover"] = 4] = "MainButtonHover";
-    ColorName2[ColorName2["MainButtonPressed"] = 5] = "MainButtonPressed";
-    ColorName2[ColorName2["DisabledButton"] = 6] = "DisabledButton";
-    ColorName2[ColorName2["DisabledText"] = 7] = "DisabledText";
-    ColorName2[ColorName2["ElementFire"] = 8] = "ElementFire";
-    ColorName2[ColorName2["ElementWater"] = 9] = "ElementWater";
-    ColorName2[ColorName2["ElementEarth"] = 10] = "ElementEarth";
-    ColorName2[ColorName2["ElementAir"] = 11] = "ElementAir";
-    ColorName2[ColorName2["ElementSpirit"] = 12] = "ElementSpirit";
-    return ColorName2;
-  })(ColorName || {});
   var colorSwatch = {
     Text: "#393457",
     TextHover: "#ffffff",
@@ -36989,17 +36948,51 @@
     ElementSpirit: "#ad02aa"
   };
 
-  // js/ui/components/hud/useHudViewModel.ts
-  var useHudViewModel_exports = {};
-  __export(useHudViewModel_exports, {
-    useHudViewModel: () => useHudViewModel
+  // js/ui/components/main-menu/useMenuViewModel.ts
+  var useMenuViewModel_exports = {};
+  __export(useMenuViewModel_exports, {
+    useMenuViewModel: () => useMenuViewModel
+  });
+  var import_react13 = __toESM(require_react(), 1);
+  function useMenuViewModel() {
+    const gameFlowService2 = useGameFlowService();
+    const startGame = (0, import_react13.useCallback)(() => {
+      gameFlowService2.startGame();
+    }, [gameFlowService2]);
+    return {
+      play: startGame
+    };
+  }
+
+  // js/ui/components/main-menu/mainMenu.tsx
+  var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
+  var MainMenu = () => {
+    const vm = useMenuViewModel();
+    return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Row, { gap: 10, width: 1e3, height: 200, justifyContent: Justify.Center, alignItems: Align.Center, children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+      Panel,
+      {
+        onClick: vm.play,
+        marginLeft: 90,
+        height: 100,
+        width: 100,
+        rounding: 1,
+        backgroundColor: colorSwatch.MainButton,
+        children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Text, { fontSize: 16, children: "Play" })
+      }
+    ) });
+  };
+
+  // js/ui/root-ui.tsx
+  var root_ui_exports = {};
+  __export(root_ui_exports, {
+    RootUI: () => RootUI
   });
 
   // js/ui/hooks/useSignalValue.ts
-  var import_react13 = __toESM(require_react(), 1);
+  var import_react14 = __toESM(require_react(), 1);
   function useSignalValue(signal) {
-    const [value, setValue] = (0, import_react13.useState)(signal.value);
-    (0, import_react13.useEffect)(() => {
+    const [value, setValue] = (0, import_react14.useState)(signal.value);
+    (0, import_react14.useEffect)(() => {
       return signal.subscribe(setValue);
     }, [signal]);
     return value;
@@ -37017,60 +37010,14 @@
   }
 
   // js/ui/components/hud/hud.tsx
-  var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
+  var import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
   var Hud = () => {
     const vm = useHudViewModel();
-    return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(Column, { gap: 10, width: 1e3, height: 200, justifyContent: Justify.Center, alignItems: Align.Center, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Text, { color: colorSwatch.Text, fontSize: 24, text: `Score: ${formatNumber(vm.score)}` }),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Text, { color: colorSwatch.Text, fontSize: 24, text: `Multiplier: ${formatNumber(vm.multiplier)}` })
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(Column, { gap: 10, width: 1e3, height: 200, justifyContent: Justify.Center, alignItems: Align.Center, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Text, { color: colorSwatch.Text, fontSize: 24, text: `Score: ${formatNumber(vm.score)}` }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Text, { color: colorSwatch.Text, fontSize: 24, text: `Multiplier: ${formatNumber(vm.multiplier)}` })
     ] });
   };
-
-  // js/ui/components/main-menu/mainMenu.tsx
-  var mainMenu_exports = {};
-  __export(mainMenu_exports, {
-    MainMenu: () => MainMenu
-  });
-
-  // js/ui/components/main-menu/useMenuViewModel.ts
-  var useMenuViewModel_exports = {};
-  __export(useMenuViewModel_exports, {
-    useMenuViewModel: () => useMenuViewModel
-  });
-  var import_react14 = __toESM(require_react(), 1);
-  function useMenuViewModel() {
-    const gameFlowService2 = useGameFlowService();
-    const startGame = (0, import_react14.useCallback)(() => {
-      gameFlowService2.startGame();
-    }, [gameFlowService2]);
-    return {
-      play: startGame
-    };
-  }
-
-  // js/ui/components/main-menu/mainMenu.tsx
-  var import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
-  var MainMenu = () => {
-    const vm = useMenuViewModel();
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Row, { gap: 10, width: 1e3, height: 200, justifyContent: Justify.Center, alignItems: Align.Center, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-      Panel,
-      {
-        onClick: vm.play,
-        marginLeft: 90,
-        height: 100,
-        width: 100,
-        rounding: 1,
-        backgroundColor: colorSwatch.MainButton,
-        children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Text, { fontSize: 16, children: "Play" })
-      }
-    ) });
-  };
-
-  // js/ui/root-ui.tsx
-  var root_ui_exports = {};
-  __export(root_ui_exports, {
-    RootUI: () => RootUI
-  });
 
   // js/ui/utils/menu-theme-context.ts
   var import_react15 = __toESM(require_react(), 1);
@@ -37132,7 +37079,6 @@
   _registerEditor(dist_exports3);
   _registerEditor(dist_exports2);
   _registerEditor(bootstrap_services_exports);
-  _registerEditor(HexagonTile_exports);
   _registerEditor(hex_grid_exports);
   _registerEditor(input_helper_exports);
   _registerEditor(tile_data_exports);
@@ -37140,16 +37086,10 @@
   _registerEditor(tile_materials_exports);
   _registerEditor(tile_prefabs_exports);
   _registerEditor(tile_preview_exports);
-  _registerEditor(ElementDistributionService_exports);
-  _registerEditor(GamePlayService_exports);
-  _registerEditor(ScoreService_exports);
   _registerEditor(GameServicesProvider_exports);
-  _registerEditor(hud_exports);
-  _registerEditor(useHudViewModel_exports);
   _registerEditor(mainMenu_exports);
   _registerEditor(useMenuViewModel_exports);
   _registerEditor(root_ui_exports);
-  _registerEditor(colorSwatch_exports);
 })();
 /*! Bundled license information:
 

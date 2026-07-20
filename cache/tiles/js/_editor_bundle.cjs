@@ -3299,11 +3299,11 @@
               return jsxWithValidation(type, props, key, false);
             }
           }
-          var jsx4 = jsxWithValidationDynamic;
-          var jsxs = jsxWithValidationStatic;
+          var jsx5 = jsxWithValidationDynamic;
+          var jsxs3 = jsxWithValidationStatic;
           exports.Fragment = REACT_FRAGMENT_TYPE;
-          exports.jsx = jsx4;
-          exports.jsxs = jsxs;
+          exports.jsx = jsx5;
+          exports.jsxs = jsxs3;
         })();
       }
     }
@@ -31978,6 +31978,7 @@
     gameFlowService: () => gameFlowService,
     gamePlayService: () => gamePlayService,
     registerServices: () => registerServices,
+    scoreService: () => scoreService,
     tileInteractionService: () => tileInteractionService,
     tilePlayService: () => tilePlayService
   });
@@ -32088,12 +32089,18 @@
      */
     neighbors() {
       const directions = [
-        [1, -1, 0],
         [1, 0, -1],
-        [0, 1, -1],
-        [-1, 1, 0],
+        [1, -1, 0],
+        [0, -1, 1],
         [-1, 0, 1],
-        [0, -1, 1]
+        [-1, 1, 0],
+        [0, 1, -1]
+        // [1, -1, 0],
+        // [1, 0, -1],
+        // [0, 1, -1],
+        // [-1, 1, 0],
+        // [-1, 0, 1],
+        // [0, -1, 1],
       ];
       return directions.map((a2) => {
         return {
@@ -32339,8 +32346,9 @@
 
   // js/services/GamePlayService.ts
   var GamePlayService = class {
-    constructor(elementDistributionService2, gameModel2) {
+    constructor(elementDistributionService2, scoreService2, gameModel2) {
       this.elementDistributionService = elementDistributionService2;
+      this.scoreService = scoreService2;
       this.gameModel = gameModel2;
     }
     onNewGame = new EventEmitter();
@@ -32404,17 +32412,22 @@
     placeTile(tile) {
       const existingTile = this.gameModel.getTileById(tile.id);
       if (existingTile && existingTile.type === "placeholder" /* placeholder */) {
-        const elements = this.elementDistributionService.createRandomElementDistribution();
+        const rotatedElements = this.elementDistributionService.rotateElements(
+          this.nextTile.elements,
+          this.nextTile.rotation
+        );
         this.gameModel.addTile(tile.x, tile.y, tile.z, {
           id: `${tile.x},${tile.y},${tile.z}`,
           type: "piece" /* piece */,
-          elements,
+          elements: rotatedElements,
           rotation: 0
         });
+        this.checkMatches(tile.id);
         const changedTileIds = [tile.id];
         const addedPlaceholderIds = this.surroundWithPlaceholders();
         changedTileIds.push(...addedPlaceholderIds);
         this.onTilesChanged.emit(changedTileIds);
+        this.createNextTilePreview();
       }
     }
     getTileDataById(tileId) {
@@ -32425,15 +32438,46 @@
     }
     rotatePreviewTileCounterClockwise() {
       if (this.nextTile && this.nextTile.type === "piece" /* piece */) {
-        this.nextTile.rotation = (this.nextTile.rotation + 1) % 6;
+        this.nextTile.rotation = (this.nextTile.rotation + 5) % 6;
         this.onTilePreviewChanged.emit(this.nextTile);
       }
     }
     rotatePreviewTileClockwise() {
       if (this.nextTile && this.nextTile.type === "piece" /* piece */) {
-        this.nextTile.rotation = (this.nextTile.rotation + 5) % 6;
+        this.nextTile.rotation = (this.nextTile.rotation + 1) % 6;
         this.onTilePreviewChanged.emit(this.nextTile);
       }
+    }
+    checkMatches(tileId) {
+      const placedTile = this.gameModel.getTileById(tileId);
+      if (!placedTile || placedTile.type !== "piece" /* piece */) {
+        return;
+      }
+      const placedTileData = this.gameModel.getTileDataById(placedTile.id);
+      if (!placedTileData || placedTileData.type !== "piece" /* piece */) {
+        return;
+      }
+      const neighbors = placedTile.neighbors();
+      let spirit = false;
+      const matchingNeighbors = [];
+      for (let i2 = 0; i2 < 6; i2++) {
+        const neighbor = neighbors[i2];
+        const neighborTile = this.gameModel.getTileAt(neighbor.x, neighbor.y, neighbor.z);
+        if (neighborTile && neighborTile.type === "piece" /* piece */) {
+          const neighborTileData = this.gameModel.getTileDataById(neighborTile.id);
+          if (neighborTileData && placedTileData && neighborTileData.type === "piece" /* piece */) {
+            const placedElement = placedTileData.elements[i2];
+            const neighborElement = neighborTileData.elements[(i2 + 3) % 6];
+            if (placedElement === neighborElement) {
+              matchingNeighbors.push(neighborTile);
+            } else if (placedElement === "spirit" || neighborElement === "spirit") {
+              spirit = true;
+            }
+          }
+        }
+      }
+      this.scoreService.addScore(matchingNeighbors.length, spirit);
+      console.log(`Matching neighbors:`, matchingNeighbors.length);
     }
   };
 
@@ -32939,6 +32983,43 @@
       }
       return elements;
     }
+    rotateElements(elements, rotation) {
+      const rotatedElements = [];
+      for (let i2 = 0; i2 < 6; i2++) {
+        const rotatedIndex = (i2 + rotation) % 6;
+        rotatedElements[i2] = elements[rotatedIndex];
+      }
+      return rotatedElements;
+    }
+  };
+
+  // js/services/ScoreService.ts
+  var ScoreService = class {
+    score = y(0);
+    multiplier = y(1);
+    constructor() {
+    }
+    clearScore() {
+      this.score.value = 0;
+      this.resetMultiplier();
+    }
+    addScore(matchedTiles, spirit) {
+      if (matchedTiles == 0) {
+        if (!spirit) {
+          this.resetMultiplier();
+        }
+        return;
+      }
+      let baseScore = matchedTiles * 10;
+      this.score.value += baseScore * this.multiplier.value;
+      if (this.multiplier.value < 10) {
+        this.multiplier.value += 1;
+      }
+      console.log(`Adding score for ${matchedTiles}(${baseScore}) matched tiles. Spirit: ${spirit}`);
+    }
+    resetMultiplier() {
+      this.multiplier.value = 1;
+    }
   };
 
   // js/bootstrap-services.ts
@@ -32949,6 +33030,7 @@
     tileInteractionService: Symbol("TileInteractionService"),
     tilePlayService: Symbol("TilePlayService"),
     elementDistributionService: Symbol("ElementDistributionService"),
+    scoreService: Symbol("ScoreService"),
     configModel: Symbol("ConfigModel"),
     gameModel: Symbol("GameModel")
   };
@@ -32956,7 +33038,8 @@
   var configModel = new ConfigModel();
   var configService = new ConfigService(configModel);
   var elementDistributionService = new ElementDistributionService();
-  var gamePlayService = new GamePlayService(elementDistributionService, gameModel);
+  var scoreService = new ScoreService();
+  var gamePlayService = new GamePlayService(elementDistributionService, scoreService, gameModel);
   var gameFlowService = new GameFlowService(gamePlayService);
   var tileInteractionService = new TileInteractionService(gamePlayService);
   var tilePlayService = new TilePlayService(gamePlayService, tileInteractionService);
@@ -32969,6 +33052,7 @@
     serviceLocator.registerSingleton(Services.tileInteractionService, tileInteractionService);
     serviceLocator.registerSingleton(Services.tilePlayService, tilePlayService);
     serviceLocator.registerSingleton(Services.elementDistributionService, elementDistributionService);
+    serviceLocator.registerSingleton(Services.scoreService, scoreService);
   }
 
   // js/components/hex-grid.ts
@@ -33071,9 +33155,11 @@
   ], TileMaterials.prototype, "spiritMaterial", 2);
 
   // js/components/hex-grid.ts
+  var tempQuat5 = quat_exports.create();
   var HexGrid = class extends Component3 {
     static onRegister(engine) {
       engine.registerComponent(TileData);
+      engine.registerComponent(SelfDestruct);
     }
     get gamePlayService() {
       return serviceLocator.get(Services.gamePlayService);
@@ -33104,7 +33190,8 @@
       for (const tileId of changedTileIds) {
         const existingTile = this.hexTiles.get(tileId);
         if (existingTile && !existingTile.isDestroyed) {
-          existingTile.destroy();
+          existingTile.setScalingWorld([0, 0, 0]);
+          existingTile.addComponent(SelfDestruct, { delay: 500 });
           this.hexTiles.delete(tileId);
         }
         const tile = this.gamePlayService.getTile(tileId);
@@ -33288,7 +33375,7 @@
   };
 
   // js/components/tile-preview.ts
-  var tempQuat5 = quat_exports.create();
+  var tempQuat6 = quat_exports.create();
   var TilePreview = class extends Component3 {
     previewTileObject;
     previewMaterials;
@@ -33330,8 +33417,8 @@
       }
       this.previewMaterials?.setMaterials(tileData.elements);
       const rotation = EWUtils.rotationToDegrees(tileData.rotation);
-      quat_exports.fromEuler(tempQuat5, 0, rotation, 0);
-      this.previewTileObject.setRotationLocal(tempQuat5);
+      quat_exports.fromEuler(tempQuat6, 0, rotation, 0);
+      this.previewTileObject.setRotationLocal(tempQuat6);
     };
     onTileHover = (tileId, tilePos) => {
       if (!this.previewTileObject) {
@@ -33366,7 +33453,8 @@
     GameServicesProvider: () => GameServicesProvider,
     useGameFlowService: () => useGameFlowService,
     useGamePlayService: () => useGamePlayService,
-    useGameServices: () => useGameServices
+    useGameServices: () => useGameServices,
+    useScoreService: () => useScoreService
   });
   var import_react = __toESM(require_react(), 1);
   var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
@@ -33386,6 +33474,9 @@
   }
   function useGamePlayService() {
     return useGameServices().gamePlayService;
+  }
+  function useScoreService() {
+    return useGameServices().scoreService;
   }
 
   // js/ui/components/main-menu/mainMenu.tsx
@@ -36842,7 +36933,7 @@
 
   // js/ui/utils/colorSwatch.ts
   var colorSwatch = {
-    Text: "#f7e476",
+    Text: "#393457",
     TextHover: "#ffffff",
     PanelBackground: "#393457",
     MainButton: "#5bb361",
@@ -36897,25 +36988,46 @@
     RootUI: () => RootUI
   });
 
-  // js/ui/utils/menu-theme-context.ts
-  var import_react14 = __toESM(require_react(), 1);
-  var import_react15 = __toESM(require_react(), 1);
-  var MenuThemeContext = (0, import_react15.createContext)(
-    null
-  );
-
   // js/ui/hooks/useSignalValue.ts
-  var import_react16 = __toESM(require_react(), 1);
+  var import_react14 = __toESM(require_react(), 1);
   function useSignalValue(signal) {
-    const [value, setValue] = (0, import_react16.useState)(signal.value);
-    (0, import_react16.useEffect)(() => {
+    const [value, setValue] = (0, import_react14.useState)(signal.value);
+    (0, import_react14.useEffect)(() => {
       return signal.subscribe(setValue);
     }, [signal]);
     return value;
   }
 
-  // js/ui/root-ui.tsx
+  // js/ui/components/hud/useHudViewModel.ts
+  function useHudViewModel() {
+    const scoreService2 = useScoreService();
+    const score = useSignalValue(scoreService2.score);
+    const multiplier = useSignalValue(scoreService2.multiplier);
+    return {
+      score,
+      multiplier
+    };
+  }
+
+  // js/ui/components/hud/hud.tsx
   var import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
+  var Hud = () => {
+    const vm = useHudViewModel();
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(Column, { gap: 10, width: 1e3, height: 200, justifyContent: Justify.Center, alignItems: Align.Center, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Text, { color: colorSwatch.Text, fontSize: 24, text: `Score: ${formatNumber(vm.score)}` }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Text, { color: colorSwatch.Text, fontSize: 24, text: `Multiplier: ${formatNumber(vm.multiplier)}` })
+    ] });
+  };
+
+  // js/ui/utils/menu-theme-context.ts
+  var import_react15 = __toESM(require_react(), 1);
+  var import_react16 = __toESM(require_react(), 1);
+  var MenuThemeContext = (0, import_react16.createContext)(
+    null
+  );
+
+  // js/ui/root-ui.tsx
+  var import_jsx_runtime9 = __toESM(require_jsx_runtime(), 1);
   var App = (props) => {
     const gameFlowService2 = useGameFlowService();
     const gameState = useSignalValue(gameFlowService2.gameState);
@@ -36936,21 +37048,25 @@
       }
     };
     const comp = props.comp;
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(MaterialContext.Provider, { value: comp, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(MenuThemeContext.Provider, { value: DefaultTheme, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Container, { width: 1e3, height: 200, justifyContent: Justify.Center, alignItems: Align.Center, children: gameState === "menu" /* Menu */ && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(MainMenu, {}) }) }) });
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(MaterialContext.Provider, { value: comp, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(MenuThemeContext.Provider, { value: DefaultTheme, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(Container, { width: 1e3, height: 200, justifyContent: Justify.Center, alignItems: Align.Center, children: [
+      gameState === "menu" /* Menu */ && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(MainMenu, {}),
+      gameState === "playing" /* Playing */ && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Hud, {})
+    ] }) }) });
   };
   var RootUI = class extends ReactUiBase {
     update(dt) {
       super.update();
     }
     render() {
-      return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
         GameServicesProvider,
         {
           services: {
             gameFlowService,
-            gamePlayService
+            gamePlayService,
+            scoreService
           },
-          children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(App, { comp: this })
+          children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(App, { comp: this })
         }
       );
     }
